@@ -1,0 +1,94 @@
+---
+title: "Assignment2Notebook"
+author: "Bikramjit Chowdhury"
+date: "06/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+##install.packages("tidyverse")
+library(tidyverse)
+##install.packages("Stat2Data")
+library(Stat2Data)
+data("Hawks")
+##check the dimension of hawksSmall
+hawksSmall<-drop_na(select(Hawks,Age,Day,Month,Year,CaptureTime,Species,Wing,Weight,Tail))
+head(hawksSmall,5)
+
+
+##Univariate plots
+ggplot(data=hawksSmall ,aes(x=Weight))+xlab("Weight(gms)")+geom_histogram(binwidth=100)+ylab("Count")
+
+ggplot(data=hawksSmall ,aes(x=Tail))+xlab("Tail")+geom_density()+ylab("Density")
+
+ggplot(data=hawksSmall ,aes(x=Tail))+xlab("Tail")+geom_density(adjust=0.5)+ylab("Density")
+
+ggplot(data=hawksSmall ,aes(x=Tail))+xlab("Tail")+geom_density(adjust=1)+ylab("Density")
+
+##Modes of distribution is trimodal for the above plot
+## The adjust arguments shapes
+
+##Bivariate plots
+
+##Aesthetics
+## X-> Tail
+## Color -> Species
+
+ggplot(data=hawksSmall ,aes(x=Tail,color=Species))+xlab("Tail")+geom_density()+theme_bw()+ylab("Density")
+
+ggplot(data=hawksSmall ,aes(x=Tail,y=Species,fill=Species))+xlab("Tail")+geom_violin()+theme_bw()+ylab("Species")
+
+##Scatter Plots
+
+ggplot(data=hawksSmall ,aes(x=Tail,y=Weight,fill=Species))+xlab("Tail")+geom_point(aes(color=Species ,shape=Species),size=3)+ylab("Weight")
+
+## There are four aesthetids her Tail ->Horizontal Postition, Weight-> Vertical Postion,  Species> Shape ,colour
+
+ggplot(data=hawksSmall ,aes(x=Tail,y=Weight,fill=Species))+xlab("Tail")+geom_point(aes(color=Species ,shape=Species),size=3)+ylab("Weight")+facet_wrap(~Species)
+
+##Trends
+ggplot(data=hawksSmall ,aes(x=Tail,y=Weight,fill=Species))+xlab("Tail")+geom_point(aes(color=Species ,shape=Species),size=3)+ylab("Weight")+facet_wrap(~Species)+geom_smooth(method='lm')
+
+##Trends
+ggplot(data=hawksSmall ,aes(x=Tail,y=Weight,fill=Species))+xlab("Tail")+geom_point(aes(color=Species ,shape=Species),size=3)+ylab("Weight")+geom_smooth(method='lm')+geom_curve(x=185,xend=195,y=1650,yend=2000,arrow=arrow(length=unit(0.5,"cm")),curvature=0.1)+geom_text(x=150,y=1650,label="The heaviest hawk weighs 200 kg")
+
+hSF<-Hawks%>%
+  filter(Species=="RT" & Weight>1000)%>%
+  select(Wing,Weight,Tail)
+
+##Variables ->3 ,Observations 387
+```
+
+
+##1. Month  --> Discrete
+##2. Species -->Categorical
+##3. Age --> Categorical
+##4. Wing -->Continuous
+##5. Weight -->Continuous
+
+##1.2 What’s wrong with this plot?
+##There is not specification of X and Y labels. Its hard to read the values. Relationships cannot be established on the visual elements.
+
+##Describe the aesthetic
+## Weight --> Horizontal postion
+##Bimodal
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

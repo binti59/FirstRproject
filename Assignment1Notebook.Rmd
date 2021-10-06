@@ -1,0 +1,48 @@
+---
+title: "My First R Markdown Document"
+author: "Bikramjit Chowdhury"
+date: "30/09/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r} 
+
+##Create a Vector x
+
+x <- seq(0,20,0.01)
+##Create a Vector Y
+y <- sin(x)
+
+#create a sin function for the data
+sin_df<-data.frame(x,y)
+
+#Check the first few rows
+
+head(sin_df,3)
+
+
+```
+$y=\sin(x)$
+
+\[ A=\left(\begin{matrix} a_{11} & a_{12}\\ a_{21} & a_{22} \end{matrix}\right). \]
+
+\[ \sin(x)=\sum_{n=1}^{\infty}(-1)^{n+1}\cdot \frac{x^{2n-1}}{(2n-1)!}
+\approx x-\frac{x^3}{3!}+\frac{x^5}{5!}-\frac{x^7}{7!}\ldots. \]
+## Including plots
+
+We can also embed plots. By using `echo = FALSE` we display only the output and not the code.
+
+```{r, echo=FALSE}
+
+# A simple plot
+plot(x,y) 
+
+
+
+
+```
+.
