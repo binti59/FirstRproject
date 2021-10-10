@@ -66,7 +66,82 @@ hSF<-Hawks%>%
   filter(Species=="RT" & Weight>1000)%>%
   select(Wing,Weight,Tail)
 
+##arrange Function
+hSF%>%arrange(Wing)
+
 ##Variables ->3 ,Observations 387
+
+#species <-unique(Hawks$Species)
+#species_full_name<-c("Red-tailed", "Cooper’s","Sharp-shinned") 
+#species_full_name_df(data.frame(species,species_full_name))
+
+ #hawksFullName <- Hawks%>% left_join(species_full_name_df %>%rename(Species=species))%>% select(- Species)%>%select(species_full_name,Wing,Weight,Tail) %>% head(7)
+
+ ##Here it does not matter which function you use as the elements are present for each type in the rows in both the table. It matters when they are not
+
+ hawksWithBMI <- Hawks %>% mutate(bird_BMI=1000*Weight/(Wing*Wing)) %>% select(Species,bird_BMI) %>% arrange(desc (bird_BMI))%>% filter(bird_BMI<100)
+ 
+
+ 
+ ggplot(data=hawksWithBMI ,aes(x=bird_BMI,y=Species,fill=Species))+xlab("Tail")+geom_violin()+theme_bw()+xlab("Bird BMI") +ylab("Species")
+ 
+ #hawksFullName %>% group_by (species_full_name) %>% #summarize(num_rows=n(),avg_wing_span=mean(Wing,na.rm=TRUE),median_wing_span=median(Wing,na.rm=TRUE),trim_wing_sp#an=mean(Wing,na.rm=TRUE,trim=0.1),tail_wing_ratio=mean(Wing/Tail,na.rm=TRUE))
+ 
+#Hawks%>% select(Species,Wing, Weight, Culmen, Hallux, Tail, StandardTail, Tarsus,Crop) %>% group_by (Species) %>%summarize(across(everything(),~sum(is.na(.x))))
+
+#Without Group by
+#Hawks%>%summarize(avg_wing_span=mean(Wing,na.rm=TRUE),median_wing_span=median(Wing,na.rm=TRUE),trim_wing_span=mean(Wing,na.rm=TRUE,trim=0.1),avg_weight_span=mean(Weight,na.rm=TRUE),median_weight_span=median(Weight,na.rm=TRUE),trim_weight_span=mean(Weight,na.rm=TRUE,trim=0.1))
+
+#With Group by
+#Hawks%>% group_by (Species) %>% summarize(avg_wing_span=mean(Wing,na.rm=TRUE),median_wing_span=median(Wing,na.rm=TRUE),trim_wing_span=mean(Wing,na.rm=TRUE,trim=0.1),avg_weight_span=mean(Weight,na.rm=TRUE),median_weight_span=median(Weight,na.rm=TRUE),trim_weight_span=mean(Weight,na.rm=TRUE,trim=0.1))
+
+#Hawks%>%
+#group_by(Species) %>%
+#summarise(across(c("Wing","Weight"),
+#list(mean=~mean(.x,na.rm=1),
+#t_mean=~mean(.x,na.rm=1,trim=0.1),
+#med=~median(.x,na.rm=1))))
+ 
+ hal<-Hawks$Hallux # Extract the vector of hallux lengths
+hal<-hal[!is.na(hal)] # Remove any nans
+
+outlier_val<-100
+num_outliers<-10
+corrupted_hal<-c(hal,rep(outlier_val,times=num_outliers))
+
+num_outliers_vect<-seq(0,1000)
+mean_vect<-c()
+median_vect<-c() 
+t_mean_vect<-c() 
+
+for(num_outliers in num_outliers_vect){
+corrupted_hal<-c(hal,rep(outlier_val,times=num_outliers))
+mean_vect<-c(mean_vect,mean(corrupted_hal))
+}
+
+for(num_outliers in num_outliers_vect){
+corrupted_hal<-c(hal,rep(outlier_val,times=num_outliers))
+median_vect<-c(median_vect,median(corrupted_hal))
+}
+
+
+for(num_outliers in num_outliers_vect){
+corrupted_hal<-c(hal,rep(outlier_val,times=num_outliers))
+t_mean_vect<-c(t_mean_vect,mean(corrupted_hal,trim=0.1))
+}
+
+df_means_medians<-data.frame(num_outliers=num_outliers_vect,
+mean=mean_vect,t_mean=t_mean_vect,
+median=median_vect)
+
+df_means_medians%>%
+pivot_longer(!num_outliers, names_to = "Estimator", values_to = "Value")%>%
+ggplot(aes(x=num_outliers,color=Estimator,
+linetype=Estimator,y=Value))+
+geom_line()+xlab("Number of outliers")
+
+ggplot(data=Hawks,aes(x=Species,y=Weight))+xlab("Species")+geom_boxplot()+ylab("Weight")
+
 ```
 
 
