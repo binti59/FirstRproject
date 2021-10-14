@@ -1,0 +1,113 @@
+---
+title: "Assingment3"
+author: "Bikramjit Chowdhury"
+date: "13/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+ # A random experiment is a procedure (real or imagined) which:
+#(a) has a well-defined set of possible outcomes;
+#(b) could (at least in principle) be repeated arbitrarily many times.
+
+#An event is a set (i.e. a collection) of possible outcomes.
+#A sample space is the set of all possible outcomes of interest for a random experiment.
+# tidy verse and PurrR library
+library(tidyverse)
+
+impute_by_median<-function(x){
+med <-median(x,na.rm=1)   # first calculate the median of x
+impute_f<-function(z){  # coordinate wise imputation
+if(is.na(z)){
+return(med)
+}  #if z is na replace with mean
+else{
+return(z)#otherwise leave in place
+} 
+}
+return(map_dbl(x,impute_f)) #apply the map function to impute across vector
+}
+
+ v<-c(1,2,NA,4)
+impute_by_median(v)
+
+x<-seq(0,10,0.1)
+y <-5*x+1
+df_xy <- data.frame(x,y)
+df_xy %>% head(5)
+
+df_xy %>% 
+mutate(z=map2_dbl(x,y,~.x+.y))%>%
+ head(5)
+
+sometimes_missing <-function(index,value){
+  if(index%%5==0){return(NA)}
+  else {
+    return(value)
+  }
+}
+
+sometimes_missing(14,25)
+sometimes_missing(15,25)
+
+df_xy_missing<-data.frame(x,y)
+
+```
+
+```{r}
+df_xy_missing <- df_xy_missing %>% 
+mutate(y=map2_dbl(row_number(x),y, sometimes_missing))#%>%
+ #head(10)
+```
+```{r}
+
+
+df_xy_imputed <-df_xy_missing%>%
+  mutate(y=impute_by_median(y)) 
+
+df_xy<-df_xy%>%
+mutate(source="original")
+
+df_xy_missing<-df_xy_missing%>%
+mutate(source="corrupted")
+
+df_xy_imputed<-df_xy_imputed%>%
+mutate(source="imputed")
+
+df_combined<-rbind(df_xy,df_xy_missing,df_xy_imputed)
+
+ggplot(df_combined,aes(x=x,y=y,color=source))+geom_point()+
+facet_wrap(~source)+geom_smooth(method="lm")
+
+library(readxl) #load the readxl library
+folder_path<-"/Users/bikramjitchowdhury/Downloads/"
+file_name<-"HockeyLeague.xlsx" #
+file_path<-paste(folder_path,file_name,sep="") # create the file_path
+wins_data_frame<-read_excel(file_path,sheet="Wins") # read of a sheet from an xl file
+
+wins_data_frame %>%
+select(1:5)%>%
+head(3)
+```
+
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
