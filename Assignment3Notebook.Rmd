@@ -98,6 +98,123 @@ wins_data_frame<-read_excel(file_path,sheet="Wins") # read of a sheet from an xl
 wins_data_frame %>%
 select(1:5)%>%
 head(3)
+
+wins_tidy%>% dim() 
+
+wins_tidy<-wins_data_frame%>%rename(Team=...1)%>%
+  pivot_longer(!Team,names_to ="Year" ,values_to="val" )%>%
+  mutate(Year=as.integer(Year))%>%
+  separate(val,into=c("wins","totals"),sep=' of ',convert='True')
+
+wins_tidy%>% dim() #
+
+wins_tidy%>%head(5) # inspect the top 5 rows
+
+library(readxl) #load the readxl library
+folder_path<-"/Users/bikramjitchowdhury/Downloads/"
+file_name<-"HockeyLeague.xlsx" #
+file_path<-paste(folder_path,file_name,sep="") # create the file_path
+loss_data_frame<-read_excel(file_path,sheet="Losses") #
+
+loss_data_frame
+
+losses_tidy<-loss_data_frame%>%rename(Team=...1)%>%
+  pivot_longer(!Team,names_to ="Year" ,values_to="val" )%>%
+  mutate(Year=as.integer(Year))%>%
+  separate(val,into=c("losses","totals"),sep=' of ',convert='True')
+
+hockey_df<-inner_join(losses_tidy,wins_tidy)%>%mutate(draws=totals-wins-losses)%>%mutate(across(starts_with(c("wins","losses","draws")),~.x/totals,.names="{.col}_rt"))
+                                                                  
+hockey_df%>% head(5)
+
+hockey_df<-hockey_df%>%select(-wins,-draws,-losses)%>% group_by(Team)%>%summarise(across(starts_with(c("wins","losses","draws")),list(md=median,mn=mean),.names="{substring(.col,1,1)}_{.fn}")) %>%arrange(desc(w_md))
+
+hockey_df         
+
+#AUB ->{1,2,3,4,6}, AUC={1,2,3,4,5,6}, Aintersectb ={2}, AintersceC {nullset}, A\B ={1,3},A\C={1,2,3}, No, Yes, {1,2,3},{4,5,6}, {1,2},{3,4},{5,6}
+
+#A, nullset
+
+
+max_cor_var<-function(df,col_name){
+# function to determine the variable with maximal correlation
+v_col<-df%>%select(all_of(col_name))
+# extract variable based on col_name
+df_num<-df%>%
+select_if(is.numeric)%>%
+select(-all_of(col_name))
+# select all numeric variables excluding col_name
+correlations<-unlist(map(df_num,
+function(x){cor(x,v_col,use="complete.obs")}))
+# compute correlations with all other numeric variables
+max_abs_cor_var<-names(which(abs(correlations)==max(abs(correlations))))
+# extract the variable name
+cor<-as.double(correlations[max_abs_cor_var])
+# compute the correlation
+return(data.frame(var_name=max_abs_cor_var,cor=cor))
+# return dataframe
+}
+library("palmerpenguins")
+
+
+max_cor_var<-function(df,col_name){
+# function to determine the variable with maximal correlation
+v_col<-df%>%select(all_of(col_name))
+# extract variable based on col_name
+df_num<-df%>%
+select_if(is.numeric)%>%
+select(-all_of(col_name))
+# select all numeric variables excluding col_name
+correlations<-unlist(map(df_num,
+function(x){cor(x,v_col,use="complete.obs")}))
+# compute correlations with all other numeric variables
+max_abs_cor_var<-names(which(abs(correlations)==max(abs(correlations))))
+# extract the variable name
+cor<-as.double(correlations[max_abs_cor_var])
+# compute the correlation
+return(data.frame(var_name=max_abs_cor_var,cor=cor))
+# return dataframe
+}
+
+df_num<-penguins%>%
+select_if(is.numeric)
+
+penguins%>%
+top_correlates_by_var()
+
+top_correlates_by_var<-function(df){
+  df_num<-df%>%
+select_if(is.numeric)
+  cols<-names(df_num)
+  
+ for (a in cols){
+   d<-c()
+ d<-max_cor_var(df,a)
+   
+ }
+  return(data.frame(cols,d))
+}
+
+
+
+  df_num<-penguins#%>%
+#select_if(is.numeric)
+  
+ df_num<- names(df_num)
+ 
+ for (p in df_num){
+ print(p)
+ }
+
+  names(is.numeric(penguins))
+  
+  penguins%>%
+group_by(species)%>%
+nest()%>%
+mutate(top_cor=map(data,top_correlates_by_var))%>%
+select(-data)%>%
+unnest(cols=top_cor)#%>%
+#select(-year)
 ```
 
 
