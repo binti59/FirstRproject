@@ -142,6 +142,19 @@ geom_line()+xlab("Number of outliers")
 
 ggplot(data=Hawks,aes(x=Species,y=Weight))+xlab("Species")+geom_boxplot()+ylab("Weight")
 
+outliers <- function(x){
+ q25<-quantile(x,0.25,na.rm=1) 
+ q75<-quantile(x,0.75,na.rm=1)
+ iq_range <-q75-q25
+ return(x[((x>q75+1.5*iq_range)|(x<q25-1.5*iq_range))&is.na(x)])
+}
+num_outliers<-function(x){return(length(outliers(x)))}
+
+Hawks %>%
+group_by(Species)%>%
+summarise(num_outliers_weight=num_outliers(Weight))
+
+
 ```
 
 
