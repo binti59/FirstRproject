@@ -1,0 +1,154 @@
+---
+title: "Assignment4"
+author: "Bikramjit Chowdhury"
+date: "20/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r }
+
+ library(tidyverse)
+choose(8,3)
+
+ prob_red_spheres<-function(z){
+   a=choose(35,z)*0.3^z*0.7^(35-z)
+   return(a)
+ }
+
+ prob_red_spheres(20)
+ 
+ num_reds<-seq(1,35)
+ 
+  num_reds
+ 
+  p<-map_dbl(num_reds,prob_red_spheres)
+  
+ prob_by_num_reds<-data.frame(num_reds,p)
+ 
+ library(tidyverse)
+ 
+prob_by_num_reds%>%head(3)
+ 
+ggplot(data=prob_by_num_reds,aes(x=num_reds,y=p))+
+geom_line()+xlab("Number of Reds")+ylab("Probability")
+
+
+sample(10,35,replace=TRUE)
+
+set.seed(0)
+for(i in 1:5){
+print(sample(100,5,replace=FALSE))
+# The result may well differ every time
+}
+
+
+for(i in 1:5){
+set.seed(1)
+print(sample(100,5,replace=FALSE))
+# The result should not change
+}
+
+
+num_trials<-1000 # set the number of trials
+set.seed(0) # set the random seed
+sampling_with_replacement_simulation<-data.frame(trial=1:num_trials)%>%
+mutate(sample_balls=map(.x=trial,~sample(10,35,replace = TRUE)))
+# generate collection of num_trials simulations
+
+#mutate(sample_balls=map(.x=trial,~sample(10,35,replace = TRUE)))
+
+
+sampling_with_replacement_simulation<-sampling_with_replacement_simulation%>%mutate(num_reds=map_dbl(.x=sample_balls,~sum(.x<=3)))
+
+
+
+sampling_with_replacement_simulation
+
+num_reds_in_simulation<-sampling_with_replacement_simulation%>%pull(num_reds)
+# we extract a vector corresponding to the number of reds in each trial
+
+num_reds_in_simulation
+
+prob_by_num_reds<-prob_by_num_reds%>%
+mutate(simulation_count=map_dbl(.x=num_reds,~sum(num_reds_in_simulation==.x)))
+
+prob_by_num_reds<-prob_by_num_reds%>%
+mutate(expected_count=num_trials*p)
+
+
+prob_by_num_reds%>%
+rename(Simulation=simulation_count,Expected=expected_count)%>%
+pivot_longer(cols=c("Simulation","Expected"),
+names_to="Type",values_to="count")%>%
+ggplot(aes(num_reds,count)) +
+geom_line(aes(linetype=Type, color=Type)) +
+scale_linetype_manual(values = c("solid", "dashed"))+
+theme_bw()+
+xlab("Number of reds")+
+ylab("Count")
+
+set.seed(0)
+for(i in 1:5){
+print(sample(100,5,replace=FALSE))
+# The result may well differ every time
+
+set.seed(0)  
+num_trials<-10000000 # set the number of trials
+num_reds<-50
+num_blues<-30
+num_green<-20
+sample_size<-10
+total<-num_reds+num_blues+num_green
+
+ # set the random seed
+sampling_without_replacement_simulation<-data.frame(trial=1:num_trials)%>%
+mutate(sample_balls=map(.x=trial,~sample(total,sample_size,replace = FALSE)))%>%
+mutate(number_reds=map_dbl(.x=sample_balls,~sum(.x<=num_reds)))%>%
+mutate(number_blues=map_dbl(.x=sample_balls,~sum((num_reds<.x)&(.x<=num_reds+num_blues))))%>%
+mutate(number_green=map_dbl(.x=sample_balls,~sum((num_reds+num_blues<.x)&
+(.x<=num_reds+num_blues+num_green))))%>%
+mutate(colour_missing=(pmin(number_reds,number_blues,number_green)==0))
+
+prob_missing_simulation<-mean(sampling_without_replacement_simulation%>%pull(colour_missing))
+
+NR<-choose(total-num_reds,sample_size)
+NB<-choose(total-num_blues,sample_size)
+NG<-choose(total-num_green,sample_size)
+
+AR<-choose(num_reds,sample_size)
+AG<-choose(num_blues,sample_size)
+AB<-choose(num_green,sample_size)
+
+Q<-NR+NB+NG-AR-AG-AB
+
+TS<-choose(total,sample_size)
+ 
+prob_missing_theory<-Q/TS 
+}
+```
+
+
+
+$y=\P(z)$
+
+\[ P(z)=\binom{n}{k}\frac{3}{10}^{z} *\frac{7}{10}^{35-z}\]
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
