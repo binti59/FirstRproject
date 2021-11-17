@@ -17,6 +17,7 @@ When you click the **Knit** button a document will be generated that includes bo
 
 ```{r}
 library(tidyverse)
+library(latex2exp)
 
 set.seed(0)
 n<-1000
@@ -26,6 +27,59 @@ mutate(X=case_when(
 (0.25<=U)&(U<0.5)~5,
 (0.5<=U)&(U<=1)~0))%>%
 pull(X)
+
+
+sample_X_015<-function(a,b,n){
+  sample_X<-data.frame(U=runif(n))%>%
+mutate(X=case_when(
+(0<=U)&(U<a)~1,
+(a<=U)&(U<a+b)~5,
+(a+b<=U)&(U<=1)~0))%>%
+ pull(X)
+  return(sample_X)
+}
+
+sample<-sample_X_015(0.5,0.1,10000)
+sample
+mean(sample)
+
+#1.007
+
+
+var(sample)
+
+#1.958052
+
+
+set.seed(0)
+n<-100
+a=1/10
+simulation_by_beta<-data.frame(beta=seq(0,9/10,0.01))%>%
+mutate(sample_x=map(.x=beta,~sample_X_015(a,.x,n)))%>%
+mutate(sample_mean=map_dbl(.x=sample_x,~mean(.x)))%>%
+select(-sample_x)%>%
+mutate(expectation=a+5*beta)  
+
+simulation_by_beta%>%head(5)
+
+df_pivot<-simulation_by_beta%>%
+  rename(Sample=sample_mean,Expectation=expectation)%>%
+  pivot_longer(cols=!beta,names_to = "var",values_to = "val" )
+
+
+
+df_pivot%>%ggplot(aes(x=beta,y=val,linetype=var))+geom_line(data=df_pivot%>%filter(var=="Expectation"))+geom_point(data=df_pivot%>%filter(var=="Sample"))+ labs(x="beta",y="Mean",linetype="")+theme_bw()
+
+           
+          
+x<-seq(-4,6,0.1)
+
+normal_densities_by_x<-data.frame(x=x,density=dnorm(x,mean=1,sd=sqrt(1)),var=1)%>%
+rbind(data.frame(x=x,density=dnorm(x,mean=1,sd=sqrt(2)),var=2))%>%
+rbind(data.frame(x=x,density=dnorm(x,mean=1,sd=sqrt(3)),var=3))
+  
+ggplot(normal_densities_by_x,aes(x,y=density,color=as.character(var),linetype=as.character(var)))+geom_line()+theme_bw()+labs(colour="Variance" ,linetype="Variance" ,x="x",y="Density") 
+  
 
 
 ```
