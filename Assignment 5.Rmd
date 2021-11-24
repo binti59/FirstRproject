@@ -81,8 +81,40 @@ rbind(data.frame(x=x,density=dnorm(x,mean=1,sd=sqrt(3)),var=3))
 ggplot(normal_densities_by_x,aes(x,y=density,color=as.character(var),linetype=as.character(var)))+geom_line()+theme_bw()+labs(colour="Variance" ,linetype="Variance" ,x="x",y="Density") 
   
 
+normal_cdf_by_x<-data.frame(x=x,cdf=pnorm(x,mean=1,sd=sqrt(1)),var=1)%>%
+rbind(data.frame(x=x,cdf=pnorm(x,mean=1,sd=sqrt(2)),var=2))%>%
+rbind(data.frame(x=x,cdf=pnorm(x,mean=1,sd=sqrt(3)),var=3))
+  
+ggplot(normal_cdf_by_x,aes(x,y=cdf,color=as.character(var),linetype=as.character(var)))+geom_line()+theme_bw()+labs(colour="Variance" ,linetype="Variance" ,x="x",y="CDF") 
 
-```
+q<-seq(0,1,0.1)
+
+normal_qf_by_x<-data.frame(q=q,qf=qnorm(q,mean=1,sd=sqrt(1)),var=1)%>%
+rbind(data.frame(q=q,qf=qnorm(q,mean=1,sd=sqrt(2)),var=2))%>%
+rbind(data.frame(q=q,qf=qnorm(q,mean=1,sd=sqrt(3)),var=3))
+  
+ggplot(normal_qf_by_x,aes(x=q,y=qf,color=as.character(var),linetype=as.character(var)))+geom_line()+theme_bw()+labs(colour="Variance" ,linetype="Variance" ,x="Probability",y="QF") 
+
+
+#x<-seq(-4,6,0.1)
+set.seed(0)
+
+standardGaussianSample <-rnorm(100)
+mean1Var3GaussianSampleA <- 1+sqrt(3)*standardGaussianSample
+
+set.seed(0)
+mean1Var3GaussianSampleB <-rnorm(100,1,sqrt(3))
+
+all.equal(mean1Var3GaussianSampleA,mean1Var3GaussianSampleB)
+
+
+ggplot()+labs(x="x",y="Density")+theme_bw()+geom_line(data=(normal_densities_by_x%>%filter(var==3)),aes(x,y=density,colour="red"))+geom_density(data=data.frame(x=mean1Var3GaussianSampleA),
+aes(x,colour="blue",linetype="dashed"))+geom_vline(aes(xintercept=1,colour="green",linetype="dashed"))+geom_vline(aes(xintercept=mean(mean1Var3GaussianSampleA),colour="violet",linetype="dashed"))
+
+
+n<-50
+p=0.7
+binom_df <-data.frame(x=seq(0,50))%>% mutate(pmf=map_dbl(.x=x,~dbinom(x=.x,size=n,prob=p)))
 
 ## Including Plots
 
