@@ -15,8 +15,47 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r cars}
-summary(cars)
+```{r}
+
+library(Stat2Data)
+
+library(tidyverse)
+
+data("Hawks")
+
+RedTailedDf<-Hawks%>%
+  filter(Species=="RT")%>%
+  select(Weight,Tail,Wing)
+
+head(RedTailedDf,5)
+
+trail_RT<-RedTailedDf%>%pull(Tail)
+n<-length(trail_RT)
+
+mu_mle<-mean(trail_RT,na.rm=TRUE)
+sigma <-var(trail_RT,na.rm=TRUE)*((n-1)/n)
+sigma_mle<-sqrt(sigma)
+
+x<-seq(mu_mle-3*sigma_mle,mu_mle+3*sigma_mle,mu_mle*0.01)
+df_gaussian<-data.frame(x,Density=dnorm(x,mean=mu_mle,sd=sigma_mle),Source="trail_RT")
+df_gaussian%>%ggplot(aes(x=x,y=Density,color=Source))+geom_line()+ylab("Density Function")+theme_bw()+geom_density(data=data.frame(trail_RT),
+aes(x=trail_RT,color="Blue"))
+
+
+colors<-c("MLE density"="red","Kernel density"="blue")
+ggplot()+
+geom_line(data=data.frame(tail=x,Density=dnorm(x,
+mean=mu_mle,sd=sigma_mle)),
+aes(x=tail,y=Density,color="MLE density"))+ # plot MLE
+geom_density(data=data.frame(trail_RT=trail_RT),
+aes(x=trail_RT,color="Kernel density"))+ # plot kernel density
+labs(y="Density function",color="Estimator")+
+theme_bw()+scale_color_manual(values=colors)+ylab("Tail length (mm)")
+
+
+
+
+
 ```
 
 ## Including Plots

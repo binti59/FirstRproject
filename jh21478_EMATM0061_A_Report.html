@@ -175,14 +175,87 @@ pre code {
 <h2>R Markdown</h2>
 <p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
 <p>When you click the <strong>Knit</strong> button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
-<pre class="r"><code>summary(cars)</code></pre>
-<pre><code>##      speed           dist       
-##  Min.   : 4.0   Min.   :  2.00  
-##  1st Qu.:12.0   1st Qu.: 26.00  
-##  Median :15.0   Median : 36.00  
-##  Mean   :15.4   Mean   : 42.98  
-##  3rd Qu.:19.0   3rd Qu.: 56.00  
-##  Max.   :25.0   Max.   :120.00</code></pre>
+<pre class="r"><code>##install.packages(&quot;tidyverse&quot;)
+library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
+<pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
+## ✓ tibble  3.1.4     ✓ dplyr   1.0.7
+## ✓ tidyr   1.1.4     ✓ stringr 1.4.0
+## ✓ readr   2.0.2     ✓ forcats 0.5.1</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>##install.packages(&quot;Stat2Data&quot;)
+library(Stat2Data)
+library(readxl) #load the readxl library
+#Locate the folder path to read the file
+folder_path&lt;-&quot;/Users/bikramjitchowdhury/Downloads/SCEM/jh21478_EMATM0061_summative_assessment/jh21478_EMATM0061_A/&quot;
+#Define the file name
+file_name&lt;-&quot;finance_data_EMATM0061.csv&quot; #
+#Define the file path
+file_path&lt;-paste(folder_path,file_name,sep=&quot;&quot;) # create the file_path
+#Read the file and assign it to a new data frame finance_data_original 
+
+finance_data_original&lt;-read_csv(file_path) </code></pre>
+<pre><code>## Rows: 1051 Columns: 30</code></pre>
+<pre><code>## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (1): state_year_code
+## dbl (29): Totals.Capital.outlay, Totals.Revenue, Totals.Expenditure, Totals....</code></pre>
+<pre><code>## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>#Answer A.1
+#Rows: 1051 Columns: 30 -There are 1051 rows and 30 columns in this file
+
+#Answer A.2
+spec(finance_data_original)</code></pre>
+<pre><code>## cols(
+##   state_year_code = col_character(),
+##   Totals.Capital.outlay = col_double(),
+##   Totals.Revenue = col_double(),
+##   Totals.Expenditure = col_double(),
+##   Totals.General.expenditure = col_double(),
+##   Totals.General.revenue = col_double(),
+##   Totals.Insurance.trust..revenue = col_double(),
+##   Totals.Intergovernmental = col_double(),
+##   Totals.License.tax = col_double(),
+##   Totals.Selective.sales.tax = col_double(),
+##   Totals.Tax = col_double(),
+##   Details.Correction.Correction.Total = col_double(),
+##   Details.Education.Education.Total = col_double(),
+##   Details.Financial.Aid.Assistance.and.Subsidies = col_double(),
+##   Details.Financial.Aid.Cash.and.Securities.Total = col_double(),
+##   Details.Health.Health.Total.Expenditure = col_double(),
+##   Details.Intergovernmental.Intergovernmental.Expenditure = col_double(),
+##   Details.Intergovernmental.Intergovernmental.to.Combined.and.Unallocable = col_double(),
+##   Details.Natural.Resources.Natural.Resources.Construction = col_double(),
+##   Details.Utilities.Utilities.Current.Operation = col_double(),
+##   Details.Welfare.Welfare.Institution.Total.Expenditure = col_double(),
+##   Details.Natural.Resources.Parks.Parks.Total.Expenditure = col_double(),
+##   Details.Transportation.Highways.Highways.Total.Expenditure = col_double(),
+##   Totals..Debt.at.end.of.fiscal.year = col_double(),
+##   Details.Insurance.benefits.and.repayments = col_double(),
+##   Details.Interest.on.debt = col_double(),
+##   Details.Interest.on.general.debt = col_double(),
+##   Details.Miscellaneous.general.revenue = col_double(),
+##   Details.Other.taxes = col_double(),
+##   Details.Police.protection = col_double()
+## )</code></pre>
+<pre class="r"><code>#Create a subset of records called finance_data with 5 rename columns but 1051 rows
+finance_data&lt;-finance_data_original%&gt;%select(state_year_code,Details.Education.Education.Total,Details.Health.Health.Total.Expenditure,Details.Transportation.Highways.Highways.Total.Expenditure,Totals.Revenue,Totals.Expenditure)%&gt;%rename(education_expenditure=Details.Education.Education.Total,health_expenditure=Details.Health.Health.Total.Expenditure,transport_expenditure=Details.Transportation.Highways.Highways.Total.Expenditure,totals_revenue=Totals.Revenue,totals_expenditure=Totals.Expenditure) 
+
+#Display the results for the first 5 rows and first 5 columns only
+head(finance_data%&gt;%select(state_year_code,education_expenditure,health_expenditure))</code></pre>
+<pre><code>## # A tibble: 6 × 3
+##   state_year_code education_expenditure health_expenditure
+##   &lt;chr&gt;                           &lt;dbl&gt;              &lt;dbl&gt;
+## 1 ALABAMA__1992                 3570524                 NA
+## 2 ALABAMA__1993                 3663465                 NA
+## 3 ALABAMA__1994                 3969277             487044
+## 4 ALABAMA__1995                 4400912             491648
+## 5 ALABAMA__1996                 4872259             514380
+## 6 ALABAMA__1997                 5175279             566651</code></pre>
 </div>
 <div id="including-plots" class="section level2">
 <h2>Including Plots</h2>

@@ -40,7 +40,7 @@ spec(finance_data_original)
 finance_data<-finance_data_original%>%select(state_year_code,Details.Education.Education.Total,Details.Health.Health.Total.Expenditure,Details.Transportation.Highways.Highways.Total.Expenditure,Totals.Revenue,Totals.Expenditure)%>%rename(education_expenditure=Details.Education.Education.Total,health_expenditure=Details.Health.Health.Total.Expenditure,transport_expenditure=Details.Transportation.Highways.Highways.Total.Expenditure,totals_revenue=Totals.Revenue,totals_expenditure=Totals.Expenditure) 
 
 #Display the results for the first 5 rows and first 5 columns only
-head(finance_data%>%select(state_year_code,education_expenditure,health_expenditure))
+head(finance_data%>%select(state_year_code,education_expenditure,health_expenditure),5)
 
 
 ```
