@@ -1,0 +1,56 @@
+---
+title: "jh21478_EMATM0061_A_Report"
+author: "Bikramjit Chowdhury"
+date: "29/11/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+##install.packages("tidyverse")
+library(tidyverse)
+##install.packages("Stat2Data")
+library(Stat2Data)
+library(readxl) #load the readxl library
+#Locate the folder path to read the file
+folder_path<-"/Users/bikramjitchowdhury/Downloads/SCEM/jh21478_EMATM0061_summative_assessment/jh21478_EMATM0061_A/"
+#Define the file name
+file_name<-"finance_data_EMATM0061.csv" #
+#Define the file path
+file_path<-paste(folder_path,file_name,sep="") # create the file_path
+#Read the file and assign it to a new data frame finance_data_original 
+
+finance_data_original<-read_csv(file_path) 
+#Answer A.1
+#Rows: 1051 Columns: 30 -There are 1051 rows and 30 columns in this file
+
+#Answer A.2
+spec(finance_data_original)
+
+#Create a subset of records called finance_data with 5 rename columns but 1051 rows
+finance_data<-finance_data_original%>%select(state_year_code,Details.Education.Education.Total,Details.Health.Health.Total.Expenditure,Details.Transportation.Highways.Highways.Total.Expenditure,Totals.Revenue,Totals.Expenditure)%>%rename(education_expenditure=Details.Education.Education.Total,health_expenditure=Details.Health.Health.Total.Expenditure,transport_expenditure=Details.Transportation.Highways.Highways.Total.Expenditure,totals_revenue=Totals.Revenue,totals_expenditure=Totals.Expenditure) 
+
+#Display the results for the first 5 rows and first 5 columns only
+head(finance_data%>%select(state_year_code,education_expenditure,health_expenditure))
+
+
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
