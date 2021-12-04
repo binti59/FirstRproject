@@ -38,9 +38,8 @@ sigma_mle<-sqrt(sigma)
 
 x<-seq(mu_mle-3*sigma_mle,mu_mle+3*sigma_mle,mu_mle*0.01)
 df_gaussian<-data.frame(x,Density=dnorm(x,mean=mu_mle,sd=sigma_mle),Source="trail_RT")
-df_gaussian%>%ggplot(aes(x=x,y=Density,color=Source))+geom_line()+ylab("Density Function")+theme_bw()+geom_density(data=data.frame(trail_RT),
-aes(x=trail_RT,color="Blue"))
 
+#df_gaussian%>%ggplot(aes(x=x,y=Density,color=Source))+geom_line()+ylab("Density Function")+theme_bw()+geom_density(data=data.frame(trail_RT),aes(x=trail_RT,color="Blue"))
 
 colors<-c("MLE density"="red","Kernel density"="blue")
 ggplot()+
@@ -53,8 +52,142 @@ labs(y="Density function",color="Estimator")+
 theme_bw()+scale_color_manual(values=colors)+ylab("Tail length (mm)")
 
 
+set.seed(0)
+num_trials_per_sample_size<-100
+min_sample_size<-5
+max_sample_size<-1000
+sample_size_inc<-5
+mu_0<-1
+sigma_0<-3
+
+simulation_df<-crossing(trial=seq(num_trials_per_sample_size),sample_size=seq(min_sample_size,max_sample_size,sample_size_inc))%>%
+# create data frame of all pairs of sample_size and trial
+mutate(simulation=pmap(.l=list(trial,sample_size),.f=~rnorm(.y,mean=mu_0,sd=sigma_0)))%>%
+# simulate sequences of Gaussian random variables
+mutate(sample_md=map_dbl(.x=simulation,.f=median))%>%
+# compute the sample medians
+group_by(sample_size)%>%
+summarise(msq_error_md=mean((sample_md-mu_0)^2))
 
 
+set.seed(0)
+num_trials_per_sample_size<-100
+min_sample_size<-5
+max_sample_size<-1000
+sample_size_inc<-5
+mu_0<-1
+sigma_0<-3
+
+my_mean <-function(x){
+
+  sum(x)/(length(x))
+}
+
+simulation_df<-crossing(trial=seq(num_trials_per_sample_size),
+sample_size=seq(min_sample_size,max_sample_size,
+sample_size_inc))%>%
+# create data frame of all pairs of sample_size and trial
+mutate(simulation=pmap(.l=list(trial,sample_size),
+.f=~rnorm(.y,mean=mu_0,sd=sigma_0)))%>%
+# simulate sequences of Gaussian random variables
+mutate(sample_md=map_dbl(.x=simulation,.f=median))%>%
+# compute the sample medians
+mutate(sample_mn=map_dbl(.x=simulation,.f=mean))%>%
+# compute the sample mean
+  group_by(sample_size)%>%
+summarise(msq_error_md=mean((sample_md-mu_0)^2),
+msq_error_mn=mean((sample_mn-mu_0)^2))
+
+
+my_meanmean(seq(1,10,1))
+
+
+set.seed(0)
+num_trials_per_sample_size<-1000
+min_sample_size<-5
+max_sample_size<-1000
+sample_size_inc<-5
+mu_0<-1
+sigma_0<-3
+
+bias_simulation_df<-crossing(trial=seq(num_trials_per_sample_size),
+sample_size=seq(min_sample_size,max_sample_size,
+sample_size_inc))%>%
+# create data frame of all pairs of sample_size and trial
+mutate(simulation=pmap(.l=list(trial,sample_size),
+.f=~rnorm(.y,mean=mu_0,sd=sigma_0)))%>%
+# simulate sequences of Gaussian random variables
+mutate(var_u=map_dbl(.x=simulation,.f=var))%>%
+# compute the sample variance with n-1 normalization
+mutate(var_mle=pmap_dbl(.l=list(.x=simulation,.y=sample_size),.f=~(((.y-1)/.y)*var(.x))))%>%
+# compute the mle variance estimate with n normalization
+  group_by(sample_size)%>%
+summarise(bias_var_u=mean(var_u)-(sigma_0)^2,
+bias_var_mle=mean(var_mle)-(sigma_0)^2)%>%
+pivot_longer(cols=c(bias_var_u,bias_var_mle),
+names_to="Estimator",values_to="Bias")%>%
+mutate(Estimator=case_when(Estimator=="bias_var_u"~"Biased",
+Estimator=="bias_var_mle"~"MLE"))
+
+
+bias_simulation_df%>%
+ggplot(aes(x=sample_size,y=Bias,color=Estimator,linetype=Estimator))+geom_smooth(formula = y ~ x, method = "lm")+theme_bw()+xlab("Sample size")+ylab("Bias")
+
+
+set.seed(0)
+num_trials_per_sample_size<-1000
+min_sample_size<-5
+max_sample_size<-100
+sample_size_inc<-5
+mu_0<-1
+sigma_0<-3
+
+bias_sd_df<-crossing(trial=seq(num_trials_per_sample_size),sample_size=seq(min_sample_size,max_sample_size,sample_size_inc))%>%
+mutate(simulation=pmap(.l=list(trial,sample_size),.f=~rnorm(.y,mean=mu_0,sd=sigma_0)))%>%
+# simulate sequences of Gaussian random variables
+mutate(sqrt_var_u=map_dbl(.x=simulation,.f=~sqrt(var(.x))))%>%
+# compute the sample medians
+group_by(sample_size)%>%
+summarise(bias_sample_sd=mean((sqrt_var_u)-sigma_0))
+
+bias_sd_df%>%ggplot(aes(x=sample_size,y=bias_sample_sd))+geom_smooth(formula = y ~ x, method = "lm")+theme_bw()+xlab("Sample size")+ylab("Bias sample s.d.")
+
+#Negative Bias
+
+
+set.seed(0)
+num_trials_per_sample_size<-1000
+min_sample_size<-5
+max_sample_size<-100
+sample_size_inc<-5
+lambda<-0.5
+
+poisson_df<-crossing(trial=seq(num_trials_per_sample_size),sample_size=seq(min_sample_size,max_sample_size,sample_size_inc))%>%
+mutate(simulation=pmap(.l=list(trial,sample_size),.f=~rpois(.y,lambda=0.5)))%>%
+# simulate sequences of Poisson random variables
+mutate(lambda_mle=map_dbl(.x=simulation,.f=mean))%>%
+# compute the sample mean
+group_by(sample_size)%>%
+summarise(msq_error=mean(lambda_mle-lambda)^2  )
+
+
+poisson_df%>%ggplot(aes(x=sample_size,y=msq_error))+geom_smooth(formula = y ~ x, method = "lm")+theme_bw()+xlab("Sample size")+ylab("msq_error")
+
+
+folder_name<-"/Users/bikramjitchowdhury/Downloads/"
+file_name<-"VonBortkiewicz.csv"
+file_path<-paste(folder_path,file_name,sep="") 
+bortkiewicz_horsekick_data<-read.csv(file_path)
+bortkiewicz_horsekick_fatalities<-bortkiewicz_horsekick_data%>%pull(fatalities)
+lambda_maxle<-mean(bortkiewicz_horsekick_fatalities)
+lambda_maxle
+
+dpois(0,lambda_maxle)
+
+
+folder_name<-"/Users/bikramjitchowdhury/Downloads/"
+file_name<-"VonBortkiewicz.csv"
+file_path<-paste(folder_path,file_name,sep="") 
 
 ```
 
@@ -64,6 +197,14 @@ You can also embed plots, for example:
 
 ```{r pressure, echo=FALSE}
 plot(pressure)
+
+simulation_df%>%
+pivot_longer(cols=c(msq_error_md,msq_error_mn),
+names_to="Estimator",values_to="msq_error")%>%
+mutate(Estimator=case_when(Estimator=="msq_error_md"~"Median",
+Estimator=="msq_error_mn"~"Mean"))%>%
+ggplot(aes(x=sample_size,y=msq_error,color=Estimator,linetype=Estimator))+
+geom_smooth()+theme_bw()+xlab("Sample size")+ylab("Mean square error")
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
