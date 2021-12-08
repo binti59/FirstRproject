@@ -21,6 +21,9 @@ library(tidyverse)
 ##install.packages("Stat2Data")
 library(Stat2Data)
 library(readxl) #load the readxl library
+
+library(stringr)
+
 #Locate the folder path to read the file
 folder_path<-"/Users/bikramjitchowdhury/Downloads/SCEM/jh21478_EMATM0061_summative_assessment/jh21478_EMATM0061_A/"
 #Define the file name
@@ -34,13 +37,47 @@ finance_data_original<-read_csv(file_path)
 #Rows: 1051 Columns: 30 -There are 1051 rows and 30 columns in this file
 
 #Answer A.2
-spec(finance_data_original)
+#Calculate the number of columns in the original data frame
+ncol(finance_data_original) # 30
+
+#Calculate the number of rows in the original data frame
+nrow(finance_data_original)  #1051
 
 #Create a subset of records called finance_data with 5 rename columns but 1051 rows
 finance_data<-finance_data_original%>%select(state_year_code,Details.Education.Education.Total,Details.Health.Health.Total.Expenditure,Details.Transportation.Highways.Highways.Total.Expenditure,Totals.Revenue,Totals.Expenditure)%>%rename(education_expenditure=Details.Education.Education.Total,health_expenditure=Details.Health.Health.Total.Expenditure,transport_expenditure=Details.Transportation.Highways.Highways.Total.Expenditure,totals_revenue=Totals.Revenue,totals_expenditure=Totals.Expenditure) 
 
+
 #Display the results for the first 5 rows and first 5 columns only
 head(finance_data%>%select(state_year_code,education_expenditure,health_expenditure),5)
+
+#Answer A.3
+#Add the new column  total_savings in the finance data dataframe
+finance_data<-finance_data%>%mutate(totals_savings=(totals_revenue-totals_expenditure))
+
+#Display the first 3 rows and the four columns “state_year_code”,“totals_revenue”,“totals_expenditure”,“totals_savings” of the data frame finance_data
+head(finance_data%>%select(state_year_code,totals_revenue,totals_expenditure,totals_savings),3)
+
+#A.4
+
+
+#Separate the state_year_code coloumn into two seperate columns
+finance_data<-finance_data%>%separate(state_year_code,into=c("state","year"),sep="__")
+
+#Convert the states so that they appear with the first letter of each word in upper case and the remainder in lower case
+
+finance_data$state=str_to_title(finance_data$state)
+
+#Display the first 3 rows and the four columns
+head(finance_data%>%select(state,year,totals_revenue,totals_expenditure,totals_savings),3)
+
+#Generate a plot which displays the total revenue (“total_revenue”) as function of the year (“year”) for the following
+#four states: Louisiana, Montana, Mississippi and Kentucky.
+#Display the revenue in terms of millions of dollars
+
+finance_data%>%filter(state %in% c("Louisiana","Montana","Mississippi","Kentucky"))%>%ggplot(aes(x=year,y=totals_revenue))+xlab("Year")+theme_bw()+ylab("Revenue")+geom_smooth(method='lm')+geom_point()
+
+
+
 
 
 ```

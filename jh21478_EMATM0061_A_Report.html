@@ -209,53 +209,56 @@ finance_data_original&lt;-read_csv(file_path) </code></pre>
 #Rows: 1051 Columns: 30 -There are 1051 rows and 30 columns in this file
 
 #Answer A.2
-spec(finance_data_original)</code></pre>
-<pre><code>## cols(
-##   state_year_code = col_character(),
-##   Totals.Capital.outlay = col_double(),
-##   Totals.Revenue = col_double(),
-##   Totals.Expenditure = col_double(),
-##   Totals.General.expenditure = col_double(),
-##   Totals.General.revenue = col_double(),
-##   Totals.Insurance.trust..revenue = col_double(),
-##   Totals.Intergovernmental = col_double(),
-##   Totals.License.tax = col_double(),
-##   Totals.Selective.sales.tax = col_double(),
-##   Totals.Tax = col_double(),
-##   Details.Correction.Correction.Total = col_double(),
-##   Details.Education.Education.Total = col_double(),
-##   Details.Financial.Aid.Assistance.and.Subsidies = col_double(),
-##   Details.Financial.Aid.Cash.and.Securities.Total = col_double(),
-##   Details.Health.Health.Total.Expenditure = col_double(),
-##   Details.Intergovernmental.Intergovernmental.Expenditure = col_double(),
-##   Details.Intergovernmental.Intergovernmental.to.Combined.and.Unallocable = col_double(),
-##   Details.Natural.Resources.Natural.Resources.Construction = col_double(),
-##   Details.Utilities.Utilities.Current.Operation = col_double(),
-##   Details.Welfare.Welfare.Institution.Total.Expenditure = col_double(),
-##   Details.Natural.Resources.Parks.Parks.Total.Expenditure = col_double(),
-##   Details.Transportation.Highways.Highways.Total.Expenditure = col_double(),
-##   Totals..Debt.at.end.of.fiscal.year = col_double(),
-##   Details.Insurance.benefits.and.repayments = col_double(),
-##   Details.Interest.on.debt = col_double(),
-##   Details.Interest.on.general.debt = col_double(),
-##   Details.Miscellaneous.general.revenue = col_double(),
-##   Details.Other.taxes = col_double(),
-##   Details.Police.protection = col_double()
-## )</code></pre>
+#Calculate the number of columns in the original data frame
+ncol(finance_data_original) # 30</code></pre>
+<pre><code>## [1] 30</code></pre>
+<pre class="r"><code>#Calculate the number of rows in the original data frame
+nrow(finance_data_original)  #1051</code></pre>
+<pre><code>## [1] 1051</code></pre>
 <pre class="r"><code>#Create a subset of records called finance_data with 5 rename columns but 1051 rows
 finance_data&lt;-finance_data_original%&gt;%select(state_year_code,Details.Education.Education.Total,Details.Health.Health.Total.Expenditure,Details.Transportation.Highways.Highways.Total.Expenditure,Totals.Revenue,Totals.Expenditure)%&gt;%rename(education_expenditure=Details.Education.Education.Total,health_expenditure=Details.Health.Health.Total.Expenditure,transport_expenditure=Details.Transportation.Highways.Highways.Total.Expenditure,totals_revenue=Totals.Revenue,totals_expenditure=Totals.Expenditure) 
 
+
 #Display the results for the first 5 rows and first 5 columns only
-head(finance_data%&gt;%select(state_year_code,education_expenditure,health_expenditure))</code></pre>
-<pre><code>## # A tibble: 6 × 3
+head(finance_data%&gt;%select(state_year_code,education_expenditure,health_expenditure),5)</code></pre>
+<pre><code>## # A tibble: 5 × 3
 ##   state_year_code education_expenditure health_expenditure
 ##   &lt;chr&gt;                           &lt;dbl&gt;              &lt;dbl&gt;
 ## 1 ALABAMA__1992                 3570524                 NA
 ## 2 ALABAMA__1993                 3663465                 NA
 ## 3 ALABAMA__1994                 3969277             487044
 ## 4 ALABAMA__1995                 4400912             491648
-## 5 ALABAMA__1996                 4872259             514380
-## 6 ALABAMA__1997                 5175279             566651</code></pre>
+## 5 ALABAMA__1996                 4872259             514380</code></pre>
+<pre class="r"><code>#Answer A.3
+#Add the new column  total_savings in the finance data dataframe
+finance_data&lt;-finance_data%&gt;%mutate(totals_savings=(totals_revenue-totals_expenditure))
+
+#Display the first 3 rows and the four columns “state_year_code”,“totals_revenue”,“totals_expenditure”,“totals_savings” of the data frame finance_data
+head(finance_data%&gt;%select(state_year_code,totals_revenue,totals_expenditure,totals_savings),3)</code></pre>
+<pre><code>## # A tibble: 3 × 4
+##   state_year_code totals_revenue totals_expenditure totals_savings
+##   &lt;chr&gt;                    &lt;dbl&gt;              &lt;dbl&gt;          &lt;dbl&gt;
+## 1 ALABAMA__1992         10536166            9650515         885651
+## 2 ALABAMA__1993         11389335           10242374        1146961
+## 3 ALABAMA__1994         11599362           10815221         784141</code></pre>
+<pre class="r"><code>#A.4
+
+finance_data</code></pre>
+<pre><code>## # A tibble: 1,051 × 7
+##    state_year_code education_expenditure health_expenditure transport_expenditu…
+##    &lt;chr&gt;                           &lt;dbl&gt;              &lt;dbl&gt;                &lt;dbl&gt;
+##  1 ALABAMA__1992                 3570524                 NA               694874
+##  2 ALABAMA__1993                 3663465                 NA               856228
+##  3 ALABAMA__1994                 3969277             487044               883852
+##  4 ALABAMA__1995                 4400912             491648               924411
+##  5 ALABAMA__1996                 4872259             514380               881381
+##  6 ALABAMA__1997                 5175279             566651               837255
+##  7 ALABAMA__1998                 5362196             554980                   NA
+##  8 ALABAMA__1999                 5751997             588248               921658
+##  9 ALABAMA__2000                 6224938             598894              1076311
+## 10 ALABAMA__2001                 6385451             644288              1163889
+## # … with 1,041 more rows, and 3 more variables: totals_revenue &lt;dbl&gt;,
+## #   totals_expenditure &lt;dbl&gt;, totals_savings &lt;dbl&gt;</code></pre>
 </div>
 <div id="including-plots" class="section level2">
 <h2>Including Plots</h2>
