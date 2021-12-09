@@ -114,7 +114,61 @@ aes(x,colour="blue",linetype="dashed"))+geom_vline(aes(xintercept=1,colour="gree
 
 n<-50
 p=0.7
-binom_df <-data.frame(x=seq(0,50))%>% mutate(pmf=map_dbl(.x=x,~dbinom(x=.x,size=n,prob=p)))
+binom_df<-data.frame(x=seq(0,50))%>% mutate(pmf=map_dbl(.x=x,~dbinom(x=.x,size=n,prob=p)))
+
+binom_df%>%head(3)
+
+
+mu<-n*p
+sigma<-sqrt(mu*(1-p))
+
+
+norm_df<-data.frame(x=seq(0,n,0.01))%>%mutate(pdf=map_dbl(.x=x,~dnorm(x=.x,mean=mu,sd=sigma)))
+
+norm_df%>%head(3)
+
+
+
+colors<-c("Gaussian pdf"="red", "Binomial pmf"="blue")
+fill<-c("Gaussian pdf"="white", "Binomial pmf"="white")
+ggplot()+labs(x="x",y="Probability")+theme_bw()+
+geom_line(data=norm_df,
+aes(x,y=pdf,color="Gaussian pdf"),size=2)+
+# create plot of Gaussian density
+geom_col(data=binom_df,
+aes(x=x,y=pmf,color="Binomial pmf",fill="Binomial pmf"))+
+scale_color_manual(name = "", values=colors)+
+scale_fill_manual(name = "", values=fill)+
+xlim(c(20,50))
+
+my_cdf_exp <-function(x,lambda){
+  if(x<0)
+  {return(0)}
+  else
+    {return(1-exp(-lambda*x))
+    } 
+}
+
+
+lambda<-1/2
+map_dbl(.x=seq(-1,4),.f=~my_cdf_exp(x=.x,lambda=lambda))
+
+test_inputs<-seq(-1,10,0.1)
+my_cdf_output<-map_dbl(.x=test_inputs,.f=~my_cdf_exp(x=.x,lambda=lambda))
+inbuilt_cdf_output<-map_dbl(.x=test_inputs,.f=~pexp(q=.x,rate=lambda))
+all.equal(my_cdf_output,inbuilt_cdf_output)
+
+lambda<-1/2
+
+my_quantile_exp<-function(p,lambda){
+  q<--(1/lambda)*log(1-p)
+  return(q)
+}
+
+test_inputs<-seq(0.1,0.99,0.01)
+my_quantile_exp<-map_dbl(.x=test_inputs,.f=~my_quantile_exp(p=.x,lambda=lambda))
+inbuilt_quantile_output<-map_dbl(.x=test_inputs,.f=~qexp(p=.x,rate=lambda))
+all.equal(my_quantile_exp,inbuilt_quantile_output)
 
 ## Including Plots
 

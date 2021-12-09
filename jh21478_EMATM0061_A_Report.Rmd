@@ -21,6 +21,7 @@ library(tidyverse)
 ##install.packages("Stat2Data")
 library(Stat2Data)
 library(readxl) #load the readxl library
+library(ggplot2)
 
 library(stringr)
 
@@ -74,7 +75,7 @@ head(finance_data%>%select(state,year,totals_revenue,totals_expenditure,totals_s
 #four states: Louisiana, Montana, Mississippi and Kentucky.
 #Display the revenue in terms of millions of dollars
 
-finance_data%>%filter(state %in% c("Louisiana","Montana","Mississippi","Kentucky"))%>%ggplot(aes(x=year,y=totals_revenue))+xlab("Year")+theme_bw()+ylab("Revenue")+geom_smooth(method='lm')+geom_point()
+finance_data%>%filter(state %in% c("Louisiana","Montana","Mississippi","Kentucky"))%>%ggplot(aes(x=as.numeric(year),y=totals_revenue/1000000),fill=state ,na.rm=1)+xlab("Year")+theme_bw()+ylab("Revenue(in millions)")+geom_line(aes(color=state ,shape=state ,linetype="dashed"))
 
 
 
