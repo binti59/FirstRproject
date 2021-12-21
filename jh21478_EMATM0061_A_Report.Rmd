@@ -71,13 +71,44 @@ finance_data$state=str_to_title(finance_data$state)
 #Display the first 3 rows and the four columns
 head(finance_data%>%select(state,year,totals_revenue,totals_expenditure,totals_savings),3)
 
+#A.5
 #Generate a plot which displays the total revenue (“total_revenue”) as function of the year (“year”) for the following
 #four states: Louisiana, Montana, Mississippi and Kentucky.
 #Display the revenue in terms of millions of dollars
 
-finance_data%>%filter(state %in% c("Louisiana","Montana","Mississippi","Kentucky"))%>%ggplot(aes(x=as.numeric(year),y=totals_revenue/1000000),fill=state ,na.rm=1)+xlab("Year")+theme_bw()+ylab("Revenue(in millions)")+geom_line(aes(color=state ,shape=state ,linetype="dashed"))
+finance_data%>%rename(State=state)%>%filter(State %in% c("Louisiana","Montana","Mississippi","Kentucky"))%>%ggplot(aes(x=as.numeric(year),y=totals_revenue/1000000),color=State)+xlab("Year")+theme_bw()+ylab("Revenue(in millions)")+geom_smooth(aes(color=State,linetype=State),size=1)
 
+#A.6
 
+#Create a function called get_decade() which takes as input a number and rounds that number down to the
+#nearest multiple of 10. 
+
+get_decade<-function(x){
+ 
+  y=floor((x/10))*10  ;
+  return(y);
+}
+
+floor(log10(x)) 
+ 
+len(10)
+get_decade(43)
+
+#Use your get_decade() function to add a new column to the “finance_data” data frame called “decade” which should give the decade corresponding to the year column.
+
+finance_data<-finance_data%>%mutate(decade=get_decade(as.numeric(year)))
+
+#Three states had the highest mean-average savings (“totals_savings”) over the decade starting 2000
+
+finance_data%>%filter(decade==2000)%>%group_by(state)%>%summarise(mean_total_savings=mean(totals_savings,na.rm=TRUE))%>%arrange(desc(mean_total_savings))%>%head(3)
+
+#The three states with the highest mean total savings are Texas, Ohio and California.
+
+#
+alaska_summary<-finance_data%>%filter(state=='Alaska')%>%group_by(decade)%>%select(decade,education_expenditure,health_expenditure,transport_expenditure)%>%summarise(across(starts_with(c("education_expenditure","health_expenditure","transport_expenditure")),list(md=median,mn=mean),.names="{substring(.col,1,2)}_{.fn}"))
+
+#Display the alaska 
+alaska_summary
 
 
 
