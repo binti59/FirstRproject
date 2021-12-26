@@ -143,6 +143,13 @@ $y=\P(z)$
 
 \[ P(z)=\binom{n}{k}\frac{3}{10}^{z} *\frac{7}{10}^{35-z}\]
 
+[\ P(x) = 1-\alpha-\beta-\gamma\ if\ x=0
+       \alpha\  if x = 1
+       \beta\ if\ x=2
+        \gamma if\ x=5
+     0 otherwise.\]
+
+
 ## Including Plots
 
 You can also embed plots, for example:

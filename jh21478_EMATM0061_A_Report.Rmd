@@ -22,9 +22,10 @@ library(tidyverse)
 library(Stat2Data)
 library(readxl) #load the readxl library
 library(ggplot2)
-
+library(glmnet)
 library(stringr)
 
+#Section A
 #Locate the folder path to read the file
 folder_path<-"/Users/bikramjitchowdhury/Downloads/SCEM/jh21478_EMATM0061_summative_assessment/jh21478_EMATM0061_A/"
 #Define the file name
@@ -89,8 +90,7 @@ get_decade<-function(x){
   return(y);
 }
 
-
-get_decade(43)
+get_decade(243)
 
 #Use your get_decade() function to add a new column to the “finance_data” data frame called “decade” which should give the decade corresponding to the year column.
 
@@ -116,9 +116,260 @@ alaska_summary<-finance_data%>%filter(state=='Alaska')%>%group_by(decade)%>%sele
 #Display the Alaska summary data frame
 alaska_summary
 
+#A.8 Create a function called impute_by_median which takes as input a vector numerical values, which may include some “NA”s, and replaces any missing values (“NA”s) with the median over the vector.
+
+impute_by_median<-function(x){
+med <-median(x,na.rm=1)   # first calculate the median of x
+impute_f<-function(z){  # coordinate wise imputation
+if(is.na(z)){
+return(med)
+}  #if z is na replace with mean
+else{
+return(z)#otherwise leave in place
+} 
+}
+return(map_dbl(x,impute_f)) #apply the map function to impute across vector
+}
+
+#generate a subset of your “finance_data” data frame called “idaho_2000” which contains all those rows in which the state column takes the value “Idaho” and the “decade” column takes the value “2000” and includes the columns “year”, “education_expenditure”, “health_expenditure”, “transport_expenditure”, “totals_revenue”,“totals_expenditure”, “totals_savings” (i.e. all columns except “state” and “decade”).
 
 
+idaho_2000<-finance_data%>%filter(state=='Idaho' & decade==2000)%>%select(-state,-decade)
+
+#Now apply your “impute_by_median” data frame to create a new data frame called “idaho_2000_imputed” which is based on your existing “idaho_2000” data frame but with any missing values replaced with the corresponding median value for the that column. 
+
+idaho_2000_imputed<-idaho_2000%>%select(year,health_expenditure,education_expenditure,totals_savings)%>%summarise(year,across(where(is.numeric),~impute_by_median(.x)))
+
+#Display the imputed values
+idaho_2000_imputed
+
+
+#Section B
+
+#B.1 
+
+#Using the Total law of probability and Bye's theorem -we derive the value of phi returned by the function below
+#phi=p1*q/(p1*q+p0*(1-q))
+#a
+c_prob_person_given_alarm<-function(p0,p1,q){
+  phi=p1*q/(p1*q+p0*(1-q))
+  return (phi)
+}
+
+#b
+c_prob_person_given_alarm(0.05,0.95,0.1)
+
+# 0.6785714
+#c
+
+prob_alarm<-data.frame(q=seq(0.1,1,0.1))%>%
+mutate(prob_q=c_prob_person_given_alarm(0.05,0.95,q))
+
+prob_alarm%>%ggplot(aes(x=q, y=prob_q)) + geom_point(shape=1)+geom_smooth(method=lm)
+
+
+#B2 \end{lcases}
+
+#a) Probability mass function pX : R → [0, 1] 
 ```
+
+$y=\P(x)$
+
+\[ P(x) =\lbrace
+          {1-\alpha-\beta-\gamma\ if\ x=0 \\ 
+          \alpha\  if\ x = 1 \\ 
+          \beta\ if\ x=2 \\ 
+          \gamma\ if\ x=5\ \\ 
+            0\ otherwise.}
+            \]
+
+```{r}
+#b) Expectancy of X in terms of α,β,γ 
+```
+
+  
+ \[ E(X) =  \alpha+2\beta+5\gamma\  \]
+ 
+```{r}
+#c) Expression for population variance of X in terms of α,β,γ 
+```
+ 
+  
+ \[ Var(x) =E[X^2]- E[X]^2  \\
+  =(\alpha+4\beta+25\gamma) -(\alpha+2\beta+5\gamma)^2 \\
+  =\alpha+4\beta+25\gamma- \alpha^2-4\beta^2-25\gamma^2-4\alpha\beta-20\beta\gamma-10\alpha\gamma
+ \] 
+```{r}
+#d) Give an expression for the expectation of the random variable X in terms of α,β,γ.
+```  
+ 
+  
+ \[ 
+   E(\overline X) = E(\frac{\sum_{i=1}^{n}X_i}n) =\frac{(\alpha+2\beta+5\gamma)\ n}n \\
+   =(\alpha+2\beta+5\gamma)\]
+   
+```{r}
+#d) Give an expression for the population variance of the random variable X in terms of α,β,γ,n
+```     
+    \[ Var(\overline X) =E[\overline X^2]- E[\overline X]^2  \\
+    =E[\frac{\sum_{i=1}^{n}X_i^2}n]- E[\frac{\sum_{i=1}^{n}X_i}n]^2  \\
+  =(\alpha+4\beta+25\gamma) -\frac{n(\alpha+2\beta+5\gamma)^2}{n^2} \\
+  =\alpha+4\beta+25\gamma-\frac{ (\alpha^2+4\beta^2+25\gamma^2+4\alpha\beta+20\beta\gamma+10\alpha\gamma)}n
+ \] 
+```{r}
+#Create a function called sample_X_0125() which takes as inputs α, β, γ and n and outputs a sample X1, . . . , Xn of independent copies of X where P (X = 1) = α, P (X = 2) = β, P (X = 5)= γ and P (X /∈ {0, 1, 2, 5}) = 0
+
+sample_X_0125() 
+#Section C : 
+
+#The task and method I plan to explore is Linear Regression→Ridge regression which is a form of Supervised Learning. For the method being explored and model being developed:
+#1) Root Mean Squared error will be minimized using Ordinary Least squares (OLS) technique,  We will try to choose the parameter which minimizes validation eror.
+#2) In ridge regression, we attempt to assign a value for λ (hyper-parameter) that produces the lowest possible test MSE (mean squared error).
+  
+#Data set to be used
+#Housing in London | Kaggle
+#Location of the data set
+#https://www.kaggle.com/justinas/housing-in-london?select=housing_in_london_monthly_variables.csv  
+
+#Load the data set in R
+
+#Locate the folder path to read the file
+folder_path<-"/Users/bikramjitchowdhury/Downloads/SCEM/jh21478_EMATM0061_summative_assessment/jh21478_EMATM0061_C/"
+#Define the file name
+file_name<-"housing_in_london_monthly_variables.csv" #
+#Define the file path
+file_path<-paste(folder_path,file_name,sep="") # create the file_path
+#Read the file and assign it to a new data frame housing_in_london_monthly 
+
+housing_in_london_monthly_original<-read_csv(file_path) 
+
+#Display the data
+housing_in_london_monthly_original
+
+#Rows: 13549 Columns: 7
+#Variables in the data set Include : Date , Area, Average_price, Code, houses_sold, No_of_crimes, borough_flag
+
+#Variable Type : date → Continuous,
+#Area → Categorical
+#average Price→Continuous
+#code→Categorical
+#houses_sold→ Continuous
+#No of crimes→Continuous
+#Borough Flag → Binary
+
+#Predictive Model :The aim is to predict the change in average house prices of different areas(boroughs) over time using the mentioned supervised learning algorithm.
+#Target Variable (Label) : - Average Price.
+
+#Feature Variable : 1) Area
+#2)Date
+#3)No of Crimes
+#4) Houses sold.
+#Performance Metric : Mean Squared error
+
+#Train-Validate- Test Split(%)
+#Exploratory Data Analysis :The data set contains 13549 rows with null values on no of crimes and houses sold.
+#On dropping those rows the rows remaining will amount to 7375.
+#For training – 50% of the data shall be used.
+#For Validation – 25% of the data shall be used. – Hyperparameter lambda λ will be tuned in this step
+#For Testing – Remaining 25% of the data shall be used.
+
+housing_in_london_monthly<-na.omit(housing_in_london_monthly_original)
+
+housing_in_london_monthly%>%dim()
+
+housing_in_london_monthly<-housing_in_london_monthly%>%select(houses_sold,no_of_crimes,average_price)
+
+str(housing_in_london_monthly)
+
+#construct a plot for the average price to houses sold
+#ggplot(housing_in_london_monthly, aes(x=houses_sold, y=average_price)) + geom_point(shape=1)+geom_smooth(method=lm)
+
+#construct a plot for the average price to area
+#ggplot(housing_in_london_monthly, aes(x=area, y=average_price)) + geom_point(shape=1)+geom_smooth(method=lm)
+
+#construct a plot for the average price to date
+#ggplot(housing_in_london_monthly, aes(x=date, y=average_price)) + geom_point(shape=1)+geom_smooth(method=lm)
+
+#construct a plot for the average price to number of crimes committed
+
+#ggplot(housing_in_london_monthly, aes(x=no_of_crimes, y=average_price)) + geom_point(shape=1)+ geom_smooth(method=lm)
+
+#Create the training, validation and test split
+num_total<-housing_in_london_monthly%>%nrow()
+num_total
+num_train<-floor(0.5*num_total)
+num_train
+num_validate<-floor(0.25*num_total)
+num_validate
+num_test<-num_total-num_train-num_validate
+num_test
+
+#Randomly slice samples for the test,validation and train data
+set.seed(123) #set random seed for reproducibility
+test_inds<-sample(seq(num_total),num_test) #test indices
+validate_inds<-sample(setdiff(seq(num_total),test_inds),num_validate) #validate inds
+train_inds<-setdiff(seq(num_total),union(validate_inds,test_inds))
+
+#Create the train,validation and test data sets based on their indices
+
+housing_train<-housing_in_london_monthly%>%filter(row_number() %in% train_inds) #train data
+housing_validate<-housing_in_london_monthly%>%filter(row_number() %in% validate_inds) #validate data
+housing_test<-housing_in_london_monthly%>%filter(row_number() %in% test_inds) #test data
+
+#Now split the train,validation and test data sets into feature vectors and labels.
+
+housing_train_x <-housing_train%>%select(-average_price)%>%as.matrix() #train features
+housing_train_y <-housing_train%>%pull(average_price) #train labels
+
+housing_validate_x <-housing_validate%>%select(-average_price)%>%as.matrix() #validate features
+housing_validate_y <-housing_validate%>%pull(average_price) #validate labels
+
+
+housing_test_x <-housing_test%>%select(-average_price)%>%as.matrix() #test features
+housing_test_y <-housing_test%>%pull(average_price) #test labels
+
+#Now construct a function to train a ridge regression model and check validation performance
+compute_train_validate_error_ridge<-function(train_x,train_y,validate_x,validate_y,lambda)
+{
+  glmRidge=glmnet(x=train_x,y=train_y ,alpha=0,lambda=lambda) #trainmodel
+  train_y_est<-predict(glmRidge,newx=train_x) #train predictions
+  train_error=mean(train_y-train_y_est^2)
+  
+  validate_y_est<-predict(glmRidge,newx=validate_x)  #validate predictions
+  validate_error=mean((validate_y-validate_y_est)^2) #validation error
+  return(list(train_error=train_error,validate_error=validate_error))
+  
+}
+
+#Now choose a set of hyper-parameters to consider.
+lambda_min=0.0001
+lambdas=0.0001*(1.1^seq(250))
+
+compute_train_validate_error_ridge(train_x=housing_train_x,train_y=housing_train_y,validate_x=housing_validate_x,validate_y=housing_validate_y,lambda=0.001)
+
+#Now train a ridge regression model for each hyper-parameter and compute validation error
+
+ridge_results_df<-data.frame(lambda=lambdas)%>%mutate(out=map(lambda,~compute_train_validate_error_ridge(train_x=housing_train_x,train_y=housing_train_y,validate_x=housing_validate_x,validate_y=housing_validate_y,lambda=.x)))%>%mutate(train_error=map_dbl(out,~((.x)$train_error)),validate_error=map_dbl(out,~((.x)$validate_error)))%>%select(-out)
+
+#Now find the minimum validation error
+min_validation_error<-ridge_results_df%>%pull(validate_error)%>%min()
+
+optimal_lambda<-ridge_results_df%>%filter(validate_error==min_validation_error)%>%pull(lambda)
+
+#Get and display the optimal lambda here
+optimal_lambda
+
+#Now extract the ridge regression model with the optimal hyper-parameter
+final_ridge_model <-glmnet(x=housing_train_x,y=housing_train_y ,alpha=0,lambda=optimal_lambda)
+
+#Now use the test data to estimate the out-of-sample performance of the trained model
+
+final_ridge_test_y_est<-predict(final_ridge_model,newx=housing_test_x)  #test predictions
+final_ridge_test_error=mean((housing_test_y-final_ridge_test_y_est)^2) #test error
+```
+
+$y=\P(z)$
+  
 
 ## Including Plots
 
