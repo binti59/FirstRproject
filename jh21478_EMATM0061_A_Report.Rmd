@@ -148,20 +148,22 @@ idaho_2000_imputed
 
 #B.1 
 
-#Using the Total law of probability and Bye's theorem -we derive the value of phi returned by the function below
+#Using the Law of total probability and Baye's theorem -we derive the value of phi returned by the function below
 #phi=p1*q/(p1*q+p0*(1-q))
-#a
+
+#A)
 c_prob_person_given_alarm<-function(p0,p1,q){
   phi=p1*q/(p1*q+p0*(1-q))
   return (phi)
 }
 
 #b
+#A)
 c_prob_person_given_alarm(0.05,0.95,0.1)
 
-# 0.6785714
+# The answer comes out to be 0.6785714
 #c
-
+#A)
 prob_alarm<-data.frame(q=seq(0.1,1,0.1))%>%
 mutate(prob_q=c_prob_person_given_alarm(0.05,0.95,q))
 
@@ -171,20 +173,25 @@ prob_alarm%>%ggplot(aes(x=q, y=prob_q)) + geom_point(shape=1)+geom_smooth(method
 #B2 \end{lcases}
 
 #a) Probability mass function pX : R → [0, 1] 
+
 ```
 
 $y=\P(x)$
 
-\[ P(x) =\lbrace
-          {1-\alpha-\beta-\gamma\ if\ x=0 \\ 
-          \alpha\  if\ x = 1 \\ 
-          \beta\ if\ x=2 \\ 
-          \gamma\ if\ x=5\ \\ 
-            0\ otherwise.}
+\[ P(x) =\left\{
+                \begin{array}{ll}
+          1-\alpha-\beta-\gamma\ if\ x=0 \\ 
+          \hspace{5 mm}\alpha\  \hspace{15 mm} if\ x = 1 \\ 
+          \hspace{5 mm}\beta\ \hspace{15 mm}if\ x=2 \\ 
+          \hspace{5 mm}\gamma\ \hspace{15 mm}if\ x=5\ \\ 
+           \hspace{5 mm} 0\ \hspace{15 mm} otherwise.
+           \end{array}
+              \right.
             \]
 
 ```{r}
 #b) Expectancy of X in terms of α,β,γ 
+#A)
 ```
 
   
@@ -192,6 +199,7 @@ $y=\P(x)$
  
 ```{r}
 #c) Expression for population variance of X in terms of α,β,γ 
+#A)
 ```
  
   
@@ -201,6 +209,7 @@ $y=\P(x)$
  \] 
 ```{r}
 #d) Give an expression for the expectation of the random variable X in terms of α,β,γ.
+#A)
 ```  
  
   
@@ -209,17 +218,66 @@ $y=\P(x)$
    =(\alpha+2\beta+5\gamma)\]
    
 ```{r}
-#d) Give an expression for the population variance of the random variable X in terms of α,β,γ,n
+#e) Give an expression for the population variance of the random variable X in terms of α,β,γ,n
+#A)
 ```     
     \[ Var(\overline X) =E[\overline X^2]- E[\overline X]^2  \\
     =E[\frac{\sum_{i=1}^{n}X_i^2}n]- E[\frac{\sum_{i=1}^{n}X_i}n]^2  \\
-  =(\alpha+4\beta+25\gamma) -\frac{n(\alpha+2\beta+5\gamma)^2}{n^2} \\
-  =\alpha+4\beta+25\gamma-\frac{ (\alpha^2+4\beta^2+25\gamma^2+4\alpha\beta+20\beta\gamma+10\alpha\gamma)}n
+  =\frac{n(\alpha+4\beta+25\gamma)}{n^2} -\frac{n(\alpha+2\beta+5\gamma)^2}{n^2} \\
+  =\frac{\alpha+4\beta+25\gamma- (\alpha^2+4\beta^2+25\gamma^2+4\alpha\beta+20\beta\gamma+10\alpha\gamma)}n
  \] 
 ```{r}
-#Create a function called sample_X_0125() which takes as inputs α, β, γ and n and outputs a sample X1, . . . , Xn of independent copies of X where P (X = 1) = α, P (X = 2) = β, P (X = 5)= γ and P (X /∈ {0, 1, 2, 5}) = 0
+#f)Create a function called sample_X_0125() which takes as inputs α, β, γ and n and outputs a sample X1, . . . , Xn of independent copies of X where P (X = 1) = α, P (X = 2) = β, P (X = 5)= γ and P (X /∈ {0, 1, 2, 5}) = 0
 
-sample_X_0125() 
+#A)
+sample_X_0125<-function(n,alpha,beta, gamma){
+sample_X<-data.frame(U=runif(n))%>%   #run if simulates the uniform distribution
+mutate(X=case_when(
+(0<=U)&(U<alpha)~1,
+(alpha<=U)&(U<alpha+beta)~2,
+(alpha+beta<=U)&(U<alpha+beta+gamma)~5,
+(alpha+beta+gamma<=U)&(U<=1)~0))%>%
+pull(X)
+return(sample_X)
+} 
+
+#g) Consider α = 0.1, β = 0.2, γ = 0.3,n=100000. Use the function to generate the data
+#A)
+sample_X<-sample_X_0125(100000,0.1,0.2,0.3)
+mean(sample_X)
+var(sample_X)
+#The value of sample mean comes out to be 2.00205
+#The value of the sample variance comes out to be 4.40717
+
+# For question number (d) , the value calculated for the expectation E(X bar) is α+2β+5γ. On replacing the probabilities values in the above result we arrive at the expected value for sample mean as (0.1+2*0.2+5*0.3)=(.1+0.4+1.5)=2 .This the result I was expecting as it is very close to the value of the mean(sample_X) result which is 2.00205
+#The is because as per the law of large numbers we expect the sample average to be  close to the expectation for large samples of independent and identically distributed random variables
+
+# For question number (e) , the value calculated for the population  V(X bar) is calculated in terms of α,β, γ and n  On replacing the probabilities values in the above result we arrive at the population variance of X bar as 4.4/100000 =0.000044.This the result I was expecting as it is very close to the calculated value of the  sample variance var(sample_X) =4.407 divided  by the sample size which is 4.4*100000 =0.000044
+
+#(h)
+#Once again, take α = 0.1, β = 0.2, γ = 0.3. Conduct a simulation study to explore the behavior of the sample mean. Your study should involve 10000 trials. In each trial, you should set n = 100 and create a sample X1, . . . , Xn of independent and identically distributed random variables with P (Xi = 1) = α,P (Xi = 2) = β, P (Xi = 5) = γ and P (Xi ∈ { / 0, 1, 2, 5}) = 0 for i = 1, . . . , n. For each of the 10000 trials, compute the corresponding sample mean X based on X1, . . . , Xn.
+
+
+set.seed(0) # set the seed to create reproduciblity
+num_trials<-100000
+n=100
+alpha=0.1
+beta=0.2
+gamma=0.3
+
+simulate_sample_mean<-crossing(trial=seq(num_trials),sample_size=n)%>%
+# create data frame of all trials of the sample size
+                     mutate(sample_X=map(.x=trial,~sample_X_0125(n,alpha,beta,gamma)))%>%
+# create samples of f independent and identically distributed random variables for each of those trials using sample_X_0125 function
+                     mutate(sample_mean=map_dbl(.x=sample_X,.f=mean))
+# Compute the sample mean for each of these.
+
+#(h)Generate a histogram plot which displays the behavior of the sample mean within your simulation study.Use a bin width of 0.02. The height of each bar should correspond to the number of times the sample mean took on a value within the corresponding bin
+
+#hist(simulate_sample_mean$sample_mean)
+
+ggplot(simulate_sample_mean, aes(x=sample_mean))+geom_histogram(binwidth=0.02,color="black", fill="white")
+
 #Section C : 
 
 #The task and method I plan to explore is Linear Regression→Ridge regression which is a form of Supervised Learning. For the method being explored and model being developed:
