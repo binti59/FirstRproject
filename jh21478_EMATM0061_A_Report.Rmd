@@ -176,8 +176,6 @@ prob_alarm%>%ggplot(aes(x=q, y=prob_q)) + geom_point(shape=1)+geom_smooth(method
 
 ```
 
-$y=\P(x)$
-
 \[ P(x) =\left\{
                 \begin{array}{ll}
           1-\alpha-\beta-\gamma\ if\ x=0 \\ 
@@ -195,7 +193,7 @@ $y=\P(x)$
 ```
 
   
- \[ E(X) =  \alpha+2\beta+5\gamma\  \]
+ \[ E[X] =  \alpha+2\beta+5\gamma\  \]
  
 ```{r}
 #c) Expression for population variance of X in terms of α,β,γ 
@@ -203,7 +201,7 @@ $y=\P(x)$
 ```
  
   
- \[ Var(x) =E[X^2]- E[X]^2  \\
+ \[ Var[X] =E[X^2]- E[X]^2  \\
   =(\alpha+4\beta+25\gamma) -(\alpha+2\beta+5\gamma)^2 \\
   =\alpha+4\beta+25\gamma- \alpha^2-4\beta^2-25\gamma^2-4\alpha\beta-20\beta\gamma-10\alpha\gamma
  \] 
@@ -272,12 +270,59 @@ simulate_sample_mean<-crossing(trial=seq(num_trials),sample_size=n)%>%
                      mutate(sample_mean=map_dbl(.x=sample_X,.f=mean))
 # Compute the sample mean for each of these.
 
-#(h)Generate a histogram plot which displays the behavior of the sample mean within your simulation study.Use a bin width of 0.02. The height of each bar should correspond to the number of times the sample mean took on a value within the corresponding bin
+#(i)Generate a histogram plot which displays the behavior of the sample mean within your simulation study.Use a bin width of 0.02. The height of each bar should correspond to the number of times the sample mean took on a value within the corresponding bin
 
 #hist(simulate_sample_mean$sample_mean)
 
 ggplot(simulate_sample_mean, aes(x=sample_mean))+geom_histogram(binwidth=0.02,color="black", fill="white")
 
+#j) numerical values of expectation in the simulation study
+    x_mean <-mean(simulate_sample_mean$sample_mean) 
+    x_mean
+    # comes out to be 2.000972 and 2.0009 up-to four places of decimals
+    
+    #numerical values of variance in the simulation study
+    x_var<-var(simulate_sample_mean$sample_mean) 
+    x_var
+    # comes out to be 0.04397059 and 0.0439 up-to four places of decimals
+
+#k)  Now append to your histogram plot an additional curve of the form x 7→ 200 · fµ,σ(x), which displays a re scaled version of the probability density function of a Gaussian random variable with population mean µ = E(X) and population variance σ2 = Var(X).  
+#A
+#Set the parameters of the pdf curve as per mentioned
+tail_inc<-seq(x_mean-4*x_var,
+x_mean+4*x_var,0.0001) # generate indices
+colors<-c("PDF"="red","Histogram"="blue") # set color legend    
+
+ggplot(simulate_sample_mean,aes(x=sample_mean))+geom_histogram(binwidth=0.02,color="blue", fill="white")+geom_line(data=data.frame(tail=tail_inc,Density=10000*dnorm(tail_inc,
+mean=x_mean,sd=x_var)),
+aes(x=tail,y=Density,color="PDF"))
+
+#(l) Discuss the relationship between the histogram and the additional curve you observe. Can you explain what you observe?
+#A : When we see the histogram plot we can see that it follows a normal distribution pattern similar to the new additional curve which is introduced and the tip being around ~2 which is the sample mean for both of them. So, the strongest density of population in both cases is around 2. However the standard deviation or width of the curve is much less in case of the new additional curve that what is observed with respect to the histogram plot. So the data in the histogram plot is more spread out.
+
+#B.3
+#a) Give a formula for the the population mean and variance of an exponential random variable X with parameter λ.
+# A
+```  
+    \[ Population Mean =E[X] =\int_{-\infty}^{\infty}x.p_{\lambda}(x)dx  =\int_0^{\infty}x\lambda e^{-\lambda x} dx \hspace{40mm}\\ \\
+   = [-xe^{-\lambda x}]_0^{\infty}+\int_0^{\infty}e^{-\lambda x}dx \\
+   = [-\frac{1}\lambda e^{-\lambda x}]_0^{\infty}=\frac{1}\lambda
+  \\
+  Using\hspace{2 mm}Integration\hspace{2 mm} by\hspace{2 mm} parts,
+  E[X^2]=\int_{-\infty}^{\infty}x^2.p_{\lambda}(x)dx=\int_0^{\infty}x^2\lambda e^{-\lambda x} dx \hspace{40mm}\\\\
+  = [-x^2e^{-\lambda x}]_0^{\infty}+2\int_0^{\infty}xe^{-\lambda x}dx \\
+ = \frac{2}\lambda\int_0^{\infty}x\lambda e^{-\lambda x}dx=\frac{2}\lambda E[X]\\
+ =\frac{2}{\lambda^2} \hspace{40mm}\\
+ Var[X]=E[X^2]-E[X]^2 \hspace{40mm}\\
+ =\frac{2}{\lambda^2}-\frac{1}{\lambda^2}=\frac{1}{\lambda^2}\hspace{20mm}\\
+   \] 
+
+```{r}
+#b)Give a formula for the cumulative distribution function and the quantile function for exponential random variables with parameter λ.
+``` 
+
+
+```{r}
 #Section C : 
 
 #The task and method I plan to explore is Linear Regression→Ridge regression which is a form of Supervised Learning. For the method being explored and model being developed:
@@ -389,7 +434,7 @@ housing_test_y <-housing_test%>%pull(average_price) #test labels
 #Now construct a function to train a ridge regression model and check validation performance
 compute_train_validate_error_ridge<-function(train_x,train_y,validate_x,validate_y,lambda)
 {
-  glmRidge=glmnet(x=train_x,y=train_y ,alpha=0,lambda=lambda) #trainmodel
+  glmRidge=glmnet(x=train_x,y=train_y ,alpha=0,lambda=lambda) #train model
   train_y_est<-predict(glmRidge,newx=train_x) #train predictions
   train_error=mean(train_y-train_y_est^2)
   
@@ -426,8 +471,7 @@ final_ridge_test_y_est<-predict(final_ridge_model,newx=housing_test_x)  #test pr
 final_ridge_test_error=mean((housing_test_y-final_ridge_test_y_est)^2) #test error
 ```
 
-$y=\P(z)$
-  
+
 
 ## Including Plots
 
