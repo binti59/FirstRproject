@@ -320,7 +320,143 @@ aes(x=tail,y=Density,color="PDF"))
 ```{r}
 #b)Give a formula for the cumulative distribution function and the quantile function for exponential random variables with parameter λ.
 ``` 
+ \[ Cumulitive\hspace{2mm}distribution\hspace{2mm} function\hspace{2mm} is \hspace{2mm} given\hspace{2mm}by =F_\lambda(x) =\int_{-\infty}^{x}x.p_{\lambda}(t)dt=\left\{
+ \begin{array}{ll}0 \hspace{25mm}  if \hspace{2mm}  x<=0 \\
+  \int_0^{x}x\lambda e^{-\lambda t}dt\hspace{8mm}  if \hspace{2mm}  x>0
+  \end{array}\right.
+  \\  
+  \int_0^{x}x\lambda e^{-\lambda t}dt= [-e^{-\lambda t}]_0^{x}=1-e^{-\lambda x}
+    \\  Therefore,\hspace{2mm}Cumulitive\hspace{2mm}distribution\hspace{2mm} function\hspace{2mm}=
+    F_\lambda(x) =\int_{-\infty}^{x}x.p_{\lambda}(t)dt=\left\{
+ \begin{array}{ll}0 \hspace{25mm}  if \hspace{2mm}  x<=0 \\
+  1-e^{-\lambda x}\hspace{8mm}  if \hspace{2mm}  x>0
+  \end{array}\right.
+  \\  
+  \hspace{2mm}Quantile\hspace{2mm}function\hspace{2mm}=inf \{x ∈ R : F_\lambda(x) ≤ p\}\\
+  F^{-1}_\lambda(p)=
+  
+  \left\{
+ \begin{array}{ll}{-\infty} \hspace{20mm}  if \hspace{2mm}  p=0 \\
+  \frac{1}{\lambda}{\ln}(1-p)\hspace{8mm}  if \hspace{2mm}  p∈(0,1]
+  \end{array}\right.
+  \] 
+ 
+```{r}
+ #(c)Suppose that X1, · · · , Xn is an i.i.d sample from the exponential distribution with an unknown parameter λ0 > 0. What is the maximum likelihood estimate λˆMLE for λ0?
+#A.  
+```
+ \[ Likelihood\hspace{2mm}\lambda_0 \hspace{2mm}given \hspace{2mm} x_1 \hspace{2mm} \\
+    L(\lambda|x_1)=\lambda e^{-\lambda x_1} \\
+    Similarly,\\
+     L(\lambda|x_2)=\lambda e^{-\lambda x_2} \\
+     .\\
+     .\\
+      L(\lambda|x_n)=\lambda e^{-\lambda x_n} \\ \
+      \\
+     
+     Now,\hspace{2mm}Likelihood\hspace{2mm}\lambda_0 \hspace{2mm}given \hspace{2mm} x_1,x_2,...and \hspace{2mm} x_n \hspace{2mm}=\\
+     =L(\lambda|x1\hspace{2mm}and\hspace{2mm} x2 \hspace{2mm} and \hspace{2mm}...x_n)=
+     L(\lambda|x_1).L(\lambda|x_2)....L(\lambda|x_n)\\=\lambda e^{-\lambda x_1} .\lambda e^{-\lambda x_2}...\lambda e^{-\lambda x_n} =\lambda^n e^{-\lambda(x_1+x_2+..+x_n)}\\ \
+     \\
+     
+      Now,\hspace{2mm}Maximum \hspace{2mm}Likelihood\hspace{2mm} is \hspace{2mm}\lambda_{MLE} \hspace{2mm}derived \hspace{2mm} by\hspace{2mm} setting\\ \
+      \\
+        \frac{\partial L(\lambda|x1\hspace{2mm}and\hspace{2mm} x2 \hspace{2mm} and \hspace{2mm}...x_n)}{\partial\lambda} =\frac{\partial \lambda^n e^{-\lambda(x_1+x_2+..+x_n)}} {\partial\lambda} =0\\ \
+        \\
+        Now,\hspace{2mm}Taking \hspace{2mm}derivate\hspace{2mm} of \hspace{2mm}log \hspace{2mm}instead \hspace{2mm} w.r.t \hspace{2mm}\lambda_0\\ \
+        \\
+        \frac{\partial log(\lambda^n e^{-\lambda(x_1+x_2+..+x_n)})} {\partial\lambda}=0\\ \
+        \\
+        =>\frac{\partial log(\lambda^n)}{\partial\lambda}+\frac{\partial log e^{-\lambda(x_1+x_2+..+x_n)}}{\partial\lambda}=0 \\
+        =>\frac{n}{\lambda}-(x_1+x_2+..+x_n)=0 \\
+        =>\lambda_{MLE}=\frac{n}{(x_1+x_2+..+x_n)}
+     \] 
+     
+```{r}
+# d) Conduct a simulation study to explore the behavior of the maximum likelihood estimator λˆMLE for λ0on simulated data X1, · · · , Xn generated using the exponential distribution. Consider a setting in which λ0 = 0.01 and generate a plot of the mean squared error as a function of the sample size. 
 
+set.seed(0)
+num_trials_per_sample_size<-100
+min_sample_size<-5
+max_sample_size<-1000
+sample_size_inc<-5
+lambda_0<-0.01
+
+exponential_simulation_df<-crossing(trial=seq(num_trials_per_sample_size),sample_size=seq(min_sample_size,max_sample_size,sample_size_inc))%>%
+  # create data frame of all pairs of samples size and trials.
+  mutate(simulation=pmap(.l=list(trial,sample_size),.f=~rexp(.y,lambda_0)))%>%
+  # simulate sequences of exponential random variables
+  mutate(lambda_mle=map_dbl(.x=simulation,.f=~solve(mean(.x))))%>%
+# compute the inverse of the mean
+group_by(sample_size)%>%
+summarise(msq_error=mean((lambda_mle-lambda_0)^2))
+
+#Simulate the root mean squared error for the problem
+exponential_simulation_df%>%
+ggplot(aes(x=sample_size,y=msq_error))+geom_smooth()+theme_bw()+xlab("Sample size")+ylab("Mean square error")
+
+#Locate the folder path to read the file
+folder_path<-"/Users/bikramjitchowdhury/Downloads/SCEM/jh21478_EMATM0061_summative_assessment/jh21478_EMATM0061_B/"  # Give this path as where you would place your file
+#Define the file name
+file_name<-"bird_data_EMATM0061.csv" #
+#Define the file path
+file_path<-paste(folder_path,file_name,sep="") # create the file_path
+#Read the file and assign it to a new data frame birds_data_original
+
+birds_data_original<-read_csv(file_path) 
+
+birds_data_original<-birds_data_original%>%mutate(time_diffs=lead(Time)-Time)
+time_diffs<-birds_data_original%>%pull(time_diffs)
+#e) Maximum likelihood estimate of the  rate parameter is give by lambda_MLE
+lambda_MLE<-1/mean(time_diffs,na.rm = TRUE)
+lambda_MLE
+# 0.004982387
+
+#f)confidence interval for λ0
+
+# Here , n=15064
+
+#Let X1, . . . , Xn ∼ fλ0 are independent and identically distributed random variables with exponential distribution and probability density function
+```
+\[
+  F_{\lambda_0} (x) =\left\{
+ \begin{array}{ll}0 \hspace{18mm}  if \hspace{2mm}  x<=0 \\
+  \lambda_0 e^{-\lambda_0 t}\hspace{8mm}  if \hspace{2mm}  x>0
+  \end{array}\right.
+  \] 
+```{r}
+#Given α ∈ [0, 1] let zα/2 be the (1 − α/2)-quantile of a standard Gaussian random variable Z ∼ N (0, 1). We can compute an (approximate) confidence interval with a confidence level of (1 − α) × 100% for λ0 as follows:
+
+```
+\[
+
+ L_{\alpha} (X_1,....X_n)=\frac{1}{\overline X}(1-\frac{z_{\alpha/2}}{\sqrt{n}}) \\
+ U_{\alpha} (X_1,....X_n)=\frac{1}{\overline X}(1+\frac{z_{\alpha/2}}{\sqrt{n}})
+
+
+  \] 
+```{r}
+#A #We can create a function to takes the sample of time differences as a vector for the exponentially distributed variables and return the confidence level for the lamda paramter λ0
+exp_confidence_interval<-function(sample,confidence_level){
+alpha<-1-confidence_level
+z_alpha<-qnorm(1-alpha/2)
+n<-length(sample)
+mn<-mean(sample,na.rm=TRUE)
+ci_l<-(1/mn)*(1-z_alpha/sqrt(n))
+ci_u<-(1/mn)*(1+z_alpha/sqrt(n))
+return(c(ci_l,ci_u))
+}
+
+# Using the above function and setting confidence interval to 95%
+confidence_level=0.95
+sample<-time_diffs
+exp_confidence_interval(sample,confidence_level)
+
+#We can the lower and upper levels of confidence interval for λ0 as 0.004902823 and 0.005061950
+
+
+  
+```
 
 ```{r}
 #Section C : 
