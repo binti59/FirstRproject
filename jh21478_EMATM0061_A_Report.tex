@@ -1,0 +1,464 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  pdftitle={jh21478\_EMATM0061\_A\_Report},
+  pdfauthor={Bikramjit Chowdhury},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifluatex
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\title{jh21478\_EMATM0061\_A\_Report}
+\author{Bikramjit Chowdhury}
+\date{29/11/2021}
+
+\begin{document}
+\maketitle
+
+\hypertarget{r-markdown}{%
+\subsection{R Markdown}\label{r-markdown}}
+
+This is an R Markdown document. Markdown is a simple formatting syntax
+for authoring HTML, PDF, and MS Word documents. For more details on
+using R Markdown see \url{http://rmarkdown.rstudio.com}.
+
+When you click the \textbf{Knit} button a document will be generated
+that includes both content as well as the output of any embedded R code
+chunks within the document. You can embed an R code chunk like this:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#install.packages("tidyverse")}
+\DocumentationTok{\#\#install.packages("caret")}
+\FunctionTok{library}\NormalTok{(tidyverse)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## -- Attaching packages --------------------------------------- tidyverse 1.3.1 --
+\end{verbatim}
+
+\begin{verbatim}
+## v ggplot2 3.3.5     v purrr   0.3.4
+## v tibble  3.1.4     v dplyr   1.0.7
+## v tidyr   1.1.4     v stringr 1.4.0
+## v readr   2.0.2     v forcats 0.5.1
+\end{verbatim}
+
+\begin{verbatim}
+## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\DocumentationTok{\#\#install.packages("Stat2Data")}
+\FunctionTok{library}\NormalTok{(Stat2Data)}
+\FunctionTok{library}\NormalTok{(readxl) }\CommentTok{\#load the readxl library}
+\FunctionTok{library}\NormalTok{(ggplot2)}
+\FunctionTok{library}\NormalTok{(glmnet)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: Matrix
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'Matrix'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:tidyr':
+## 
+##     expand, pack, unpack
+\end{verbatim}
+
+\begin{verbatim}
+## Loaded glmnet 4.1-3
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(stringr)}
+\FunctionTok{library}\NormalTok{(caret)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: lattice
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## Attaching package: 'caret'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:purrr':
+## 
+##     lift
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Section A}
+\CommentTok{\#Locate the folder path to read the file}
+\NormalTok{folder\_path}\OtherTok{\textless{}{-}}\StringTok{"/Users/bikramjitchowdhury/Downloads/SCEM/jh21478\_EMATM0061\_summative\_assessment/jh21478\_EMATM0061\_A/"}
+\CommentTok{\#Define the file name}
+\NormalTok{file\_name}\OtherTok{\textless{}{-}}\StringTok{"finance\_data\_EMATM0061.csv"} \CommentTok{\#}
+\CommentTok{\#Define the file path}
+\NormalTok{file\_path}\OtherTok{\textless{}{-}}\FunctionTok{paste}\NormalTok{(folder\_path,file\_name,}\AttributeTok{sep=}\StringTok{""}\NormalTok{) }\CommentTok{\# create the file\_path}
+\CommentTok{\#Read the file and assign it to a new data frame finance\_data\_original }
+
+\NormalTok{finance\_data\_original}\OtherTok{\textless{}{-}}\FunctionTok{read\_csv}\NormalTok{(file\_path) }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Rows: 1051 Columns: 30
+\end{verbatim}
+
+\begin{verbatim}
+## -- Column specification --------------------------------------------------------
+## Delimiter: ","
+## chr  (1): state_year_code
+## dbl (29): Totals.Capital.outlay, Totals.Revenue, Totals.Expenditure, Totals....
+\end{verbatim}
+
+\begin{verbatim}
+## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Answer A.1}
+\CommentTok{\#Rows: 1051 Columns: 30 {-}There are 1051 rows and 30 columns in this file}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Answer A.2}
+\CommentTok{\#Calculate the number of columns in the original data frame}
+\FunctionTok{ncol}\NormalTok{(finance\_data\_original) }\CommentTok{\# 30}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 30
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Calculate the number of rows in the original data frame}
+\FunctionTok{nrow}\NormalTok{(finance\_data\_original)  }\CommentTok{\#1051}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1051
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Create a subset of records called finance\_data with 5 rename columns but 1051 rows}
+\NormalTok{finance\_data}\OtherTok{\textless{}{-}}\NormalTok{finance\_data\_original}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{select}\NormalTok{(state\_year\_code,Details.Education.Education.Total,Details.Health.Health.Total.Expenditure,Details.Transportation.Highways.Highways.Total.Expenditure,Totals.Revenue,Totals.Expenditure)}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{rename}\NormalTok{(}\AttributeTok{education\_expenditure=}\NormalTok{Details.Education.Education.Total,}\AttributeTok{health\_expenditure=}\NormalTok{Details.Health.Health.Total.Expenditure,}\AttributeTok{transport\_expenditure=}\NormalTok{Details.Transportation.Highways.Highways.Total.Expenditure,}\AttributeTok{totals\_revenue=}\NormalTok{Totals.Revenue,}\AttributeTok{totals\_expenditure=}\NormalTok{Totals.Expenditure) }
+
+
+\CommentTok{\#Display the results for the first 5 rows and first 5 columns only}
+\FunctionTok{head}\NormalTok{(finance\_data}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{select}\NormalTok{(state\_year\_code,education\_expenditure,health\_expenditure),}\DecValTok{5}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 5 x 3
+##   state_year_code education_expenditure health_expenditure
+##   <chr>                           <dbl>              <dbl>
+## 1 ALABAMA__1992                 3570524                 NA
+## 2 ALABAMA__1993                 3663465                 NA
+## 3 ALABAMA__1994                 3969277             487044
+## 4 ALABAMA__1995                 4400912             491648
+## 5 ALABAMA__1996                 4872259             514380
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Answer A.3}
+\CommentTok{\#Add the new column  total\_savings in the finance data dataframe}
+\NormalTok{finance\_data}\OtherTok{\textless{}{-}}\NormalTok{finance\_data}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{mutate}\NormalTok{(}\AttributeTok{totals\_savings=}\NormalTok{(totals\_revenue}\SpecialCharTok{{-}}\NormalTok{totals\_expenditure))}
+
+\CommentTok{\#Display the first 3 rows and the four columns “state\_year\_code”,“totals\_revenue”,“totals\_expenditure”,“totals\_savings” of the data frame finance\_data}
+\FunctionTok{head}\NormalTok{(finance\_data}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{select}\NormalTok{(state\_year\_code,totals\_revenue,totals\_expenditure,totals\_savings),}\DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 3 x 4
+##   state_year_code totals_revenue totals_expenditure totals_savings
+##   <chr>                    <dbl>              <dbl>          <dbl>
+## 1 ALABAMA__1992         10536166            9650515         885651
+## 2 ALABAMA__1993         11389335           10242374        1146961
+## 3 ALABAMA__1994         11599362           10815221         784141
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#A.4}
+
+
+\CommentTok{\#Separate the state\_year\_code coloumn into two seperate columns}
+\NormalTok{finance\_data}\OtherTok{\textless{}{-}}\NormalTok{finance\_data}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{separate}\NormalTok{(state\_year\_code,}\AttributeTok{into=}\FunctionTok{c}\NormalTok{(}\StringTok{"state"}\NormalTok{,}\StringTok{"year"}\NormalTok{),}\AttributeTok{sep=}\StringTok{"\_\_"}\NormalTok{)}
+
+\CommentTok{\#Convert the states so that they appear with the first letter of each word in upper case and the remainder in lower case}
+
+\NormalTok{finance\_data}\SpecialCharTok{$}\NormalTok{state}\OtherTok{=}\FunctionTok{str\_to\_title}\NormalTok{(finance\_data}\SpecialCharTok{$}\NormalTok{state)}
+
+\CommentTok{\#Display the first 3 rows and the four columns}
+\FunctionTok{head}\NormalTok{(finance\_data}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{select}\NormalTok{(state,year,totals\_revenue,totals\_expenditure,totals\_savings),}\DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 3 x 5
+##   state   year  totals_revenue totals_expenditure totals_savings
+##   <chr>   <chr>          <dbl>              <dbl>          <dbl>
+## 1 Alabama 1992        10536166            9650515         885651
+## 2 Alabama 1993        11389335           10242374        1146961
+## 3 Alabama 1994        11599362           10815221         784141
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#A.5}
+\CommentTok{\#Generate a plot which displays the total revenue (“total\_revenue”) as function of the year (“year”) for the following}
+\CommentTok{\#four states: Louisiana, Montana, Mississippi and Kentucky.}
+\CommentTok{\#Display the revenue in terms of millions of dollars}
+
+\NormalTok{finance\_data}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{rename}\NormalTok{(}\AttributeTok{State=}\NormalTok{state)}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{filter}\NormalTok{(State }\SpecialCharTok{\%in\%} \FunctionTok{c}\NormalTok{(}\StringTok{"Louisiana"}\NormalTok{,}\StringTok{"Montana"}\NormalTok{,}\StringTok{"Mississippi"}\NormalTok{,}\StringTok{"Kentucky"}\NormalTok{))}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x=}\FunctionTok{as.numeric}\NormalTok{(year),}\AttributeTok{y=}\NormalTok{totals\_revenue}\SpecialCharTok{/}\DecValTok{1000000}\NormalTok{),}\AttributeTok{color=}\NormalTok{State)}\SpecialCharTok{+}\FunctionTok{xlab}\NormalTok{(}\StringTok{"Year"}\NormalTok{)}\SpecialCharTok{+}\FunctionTok{theme\_bw}\NormalTok{()}\SpecialCharTok{+}\FunctionTok{ylab}\NormalTok{(}\StringTok{"Revenue(in millions)"}\NormalTok{)}\SpecialCharTok{+}\FunctionTok{geom\_smooth}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{color=}\NormalTok{State,}\AttributeTok{linetype=}\NormalTok{State),}\AttributeTok{size=}\DecValTok{1}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## `geom_smooth()` using method = 'loess' and formula 'y ~ x'
+\end{verbatim}
+
+\begin{verbatim}
+## Warning: Removed 11 rows containing non-finite values (stat_smooth).
+\end{verbatim}
+
+\includegraphics{jh21478_EMATM0061_A_Report_files/figure-latex/unnamed-chunk-4-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#A.6}
+
+\CommentTok{\#Create a function called get\_decade() which takes as input a number and rounds that number down to the}
+\CommentTok{\#nearest multiple of 10. }
+
+\NormalTok{get\_decade}\OtherTok{\textless{}{-}}\ControlFlowTok{function}\NormalTok{(x)\{}
+ 
+\NormalTok{  y}\OtherTok{=}\FunctionTok{floor}\NormalTok{((x}\SpecialCharTok{/}\DecValTok{10}\NormalTok{))}\SpecialCharTok{*}\DecValTok{10}\NormalTok{  ;}
+  \FunctionTok{return}\NormalTok{(y);}
+\NormalTok{\}}
+
+\FunctionTok{get\_decade}\NormalTok{(}\DecValTok{243}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 240
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#Use your get\_decade() function to add a new column to the “finance\_data” data frame called “decade” which should give the decade corresponding to the year column.}
+
+\NormalTok{finance\_data}\OtherTok{\textless{}{-}}\NormalTok{finance\_data}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{mutate}\NormalTok{(}\AttributeTok{decade=}\FunctionTok{get\_decade}\NormalTok{(}\FunctionTok{as.numeric}\NormalTok{(year)))}
+
+\CommentTok{\#Three states had the highest mean{-}average savings (“totals\_savings”) over the decade starting 2000}
+
+\NormalTok{finance\_data}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{filter}\NormalTok{(decade}\SpecialCharTok{==}\DecValTok{2000}\NormalTok{)}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{group\_by}\NormalTok{(state)}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{summarise}\NormalTok{(}\AttributeTok{mean\_total\_savings=}\FunctionTok{mean}\NormalTok{(totals\_savings,}\AttributeTok{na.rm=}\ConstantTok{TRUE}\NormalTok{))}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(mean\_total\_savings))}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{head}\NormalTok{(}\DecValTok{3}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 3 x 2
+##   state      mean_total_savings
+##   <chr>                   <dbl>
+## 1 Texas                4103352.
+## 2 Ohio                 3025980 
+## 3 California           2510483.
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#The three states with the highest mean total savings are Texas, Ohio and California.}
+
+\CommentTok{\# Create the Alaska summary data frame with the following properties}
+\CommentTok{\#(a) “decade” – the decade (1990, 2000, 2010)}
+\CommentTok{\#(b) “ed\_mn” – the mean of the education expenditure in Alaska for the corresponding decade}
+\CommentTok{\#(c) “ed\_md” – the median of the education expenditure in Alaska for the corresponding decade}
+\CommentTok{\#(d) “he\_mn” – the mean of the health expenditure in Alaska for the corresponding decade}
+\CommentTok{\#(e) “he\_md” – the median of the health expenditure in Alaska for the corresponding decade}
+\CommentTok{\#(f) “tr\_mn” – the mean of the transport expenditure in Alaska for the corresponding decade}
+\CommentTok{\#(g) “tr\_md” – the median of the transport expenditure in Alaska for the corresponding decade.}
+
+\NormalTok{alaska\_summary}\OtherTok{\textless{}{-}}\NormalTok{finance\_data}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{filter}\NormalTok{(state}\SpecialCharTok{==}\StringTok{\textquotesingle{}Alaska\textquotesingle{}}\NormalTok{)}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{group\_by}\NormalTok{(decade)}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{select}\NormalTok{(decade,education\_expenditure,health\_expenditure,transport\_expenditure)}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{summarise}\NormalTok{(}\FunctionTok{across}\NormalTok{(}\FunctionTok{starts\_with}\NormalTok{(}\FunctionTok{c}\NormalTok{(}\StringTok{"education\_expenditure"}\NormalTok{,}\StringTok{"health\_expenditure"}\NormalTok{,}\StringTok{"transport\_expenditure"}\NormalTok{)),}\FunctionTok{list}\NormalTok{(}\AttributeTok{md=}\NormalTok{median,}\AttributeTok{mn=}\NormalTok{mean),}\AttributeTok{.names=}\StringTok{"\{substring(.col,1,2)\}\_\{.fn\}"}\NormalTok{))}
+
+\CommentTok{\#Display the Alaska summary data frame}
+\NormalTok{alaska\_summary}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 3 x 7
+##   decade    ed_md    ed_mn  he_md   he_mn  tr_md   tr_mn
+##    <dbl>    <dbl>    <dbl>  <dbl>   <dbl>  <dbl>   <dbl>
+## 1   1990 1246864. 1246426.     NA     NA      NA     NA 
+## 2   2000 1566815  1546233. 160168 152003. 687407 723347.
+## 3   2010      NA       NA  278394 274688      NA     NA
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#A.8 Create a function called impute\_by\_median which takes as input a vector numerical values, which may include some “NA”s, and replaces any missing values (“NA”s) with the median over the vector.}
+
+\NormalTok{impute\_by\_median}\OtherTok{\textless{}{-}}\ControlFlowTok{function}\NormalTok{(x)\{}
+\NormalTok{med }\OtherTok{\textless{}{-}}\FunctionTok{median}\NormalTok{(x,}\AttributeTok{na.rm=}\DecValTok{1}\NormalTok{)   }\CommentTok{\# first calculate the median of x}
+\NormalTok{impute\_f}\OtherTok{\textless{}{-}}\ControlFlowTok{function}\NormalTok{(z)\{  }\CommentTok{\# coordinate wise imputation}
+\ControlFlowTok{if}\NormalTok{(}\FunctionTok{is.na}\NormalTok{(z))\{}
+\FunctionTok{return}\NormalTok{(med)}
+\NormalTok{\}  }\CommentTok{\#if z is na replace with mean}
+\ControlFlowTok{else}\NormalTok{\{}
+\FunctionTok{return}\NormalTok{(z)}\CommentTok{\#otherwise leave in place}
+\NormalTok{\} }
+\NormalTok{\}}
+\FunctionTok{return}\NormalTok{(}\FunctionTok{map\_dbl}\NormalTok{(x,impute\_f)) }\CommentTok{\#apply the map function to impute across vector}
+\NormalTok{\}}
+
+\CommentTok{\#generate a subset of your “finance\_data” data frame called “idaho\_2000” which contains all those rows in which the state column takes the value “Idaho” and the “decade” column takes the value “2000” and includes the columns “year”, “education\_expenditure”, “health\_expenditure”, “transport\_expenditure”, “totals\_revenue”,“totals\_expenditure”, “totals\_savings” (i.e. all columns except “state” and “decade”).}
+
+
+\NormalTok{idaho\_2000}\OtherTok{\textless{}{-}}\NormalTok{finance\_data}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{filter}\NormalTok{(state}\SpecialCharTok{==}\StringTok{\textquotesingle{}Idaho\textquotesingle{}} \SpecialCharTok{\&}\NormalTok{ decade}\SpecialCharTok{==}\DecValTok{2000}\NormalTok{)}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{select}\NormalTok{(}\SpecialCharTok{{-}}\NormalTok{state,}\SpecialCharTok{{-}}\NormalTok{decade)}
+
+\CommentTok{\#Now apply your “impute\_by\_median” data frame to create a new data frame called “idaho\_2000\_imputed” which is based on your existing “idaho\_2000” data frame but with any missing values replaced with the corresponding median value for the that column. }
+
+\NormalTok{idaho\_2000\_imputed}\OtherTok{\textless{}{-}}\NormalTok{idaho\_2000}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{select}\NormalTok{(year,health\_expenditure,education\_expenditure,totals\_savings)}\SpecialCharTok{\%\textgreater{}\%}\FunctionTok{summarise}\NormalTok{(year,}\FunctionTok{across}\NormalTok{(}\FunctionTok{where}\NormalTok{(is.numeric),}\SpecialCharTok{\textasciitilde{}}\FunctionTok{impute\_by\_median}\NormalTok{(.x)))}
+
+\CommentTok{\#Display the imputed values}
+\NormalTok{idaho\_2000\_imputed}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## # A tibble: 5 x 4
+##   year  health_expenditure education_expenditure totals_savings
+##   <chr>              <dbl>                 <dbl>          <dbl>
+## 1 2000              98510                1663980        1083732
+## 2 2001             103705                1768837         334438
+## 3 2002             109896.               1768837        -746375
+## 4 2003             116088                1886421         709085
+## 5 2004             131165                1768837        1349740
+\end{verbatim}
+
+\end{document}

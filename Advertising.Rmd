@@ -1,0 +1,352 @@
+---
+title: "jh21478_EMATM0061_C_Report"
+author: "Bikramjit Chowdhury"
+date: "09/01/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+
+##install.packages("tidyverse")
+##install.packages("caret")
+library(tidyverse)
+##install.packages("Stat2Data")
+library(Stat2Data)
+library(readxl) #load the readxl library
+library(ggplot2)
+library(glmnet)
+library(stringr)
+library(caret)
+
+
+#Section C : 
+
+#The task and method I plan to explore is Linear Regression→Ridge regression which is a form of Supervised Learning. For the method being explored and model being developed:
+#The ridge regression method minimizes the regularized objective.
+
+#Ridge Regression :
+
+#1) The advantage of Ridge Regression is mainly to avoid over fitting. The main objective is to find a pattern which can be generalized i.e works best on both the training and testing data sets.
+#2)Overfitting happens when the trained model works good on the train data and performs very poorly on the testing data.
+#) Ridge regression introduces a penalizing term which helps to overcome overfitting by reducing the weights and biases.
+
+#Approach used :
+#1. Ordinary least squares is used to obtain the best fit line.
+#2. Lets say for a training data set the best fit line passes through all the data points -the model then fits very well with the training data sets and has sum of residual squares as 0. However, the testing data sets might have high variance due to the sum of residuals being large. This regression model is therefore ovrfitting the training dataset.So this means this model will perform very good during the training but will perform very poorly during the testing.
+#3. What Ridge Regression does is it takes this line and rotates a bit thus inducing some additional error.the model performance might be bit poor on the training set but it will perform well consistently on both the training and testing dataset as its more generalized. This is called Regularization.
+#4. So, Ridge Regression works by attempting to increase the bias to improve variance. This happens by changing the slope of the line.
+
+   #Ordinary least squares :- Min(Sum of the squared residuals)
+   #Ridge Regression :-Min(Sum of the squared residuals) + Lambda*Slope Squared
+   #Lambda*Slope Squared->Regularization term or the penalty.
+# The penalty can then be used to change the slope of the line by varying the Lambda
+# As Lambda increases the slope of the regression line is reduced becoming more horizontal and becomes less sensitive to the variations of the independent variable.
+
+#Q Where is ridge regression applied?- Ridge Regression is applied to data sets where we have large amount of features in a data set but not a large number of rows - but we have to find the variables which best describes a linear model. The penalizing term introduces reduces the applicability of the variables of the model to nearly 0 if they are not relevant.
+
+
+  
+#Data set to be used
+#Video_Games_Sales_as_at_22_Dec_2016 dataset | Kaggle
+#Location of the data set
+#https://www.kaggle.com/residentmario/ridge-regression-with-video-game-sales-prediction/data
+
+#Load the data set in R
+#Clear the Workspace
+rm(list=ls())
+#Locate the folder path to read the file
+folder_path<-"/Users/bikramjitchowdhury/Downloads/SCEM/jh21478_EMATM0061_summative_assessment/jh21478_EMATM0061_C/"
+#Define the file name
+#file_name<-"Video_Games_Sales_as_at_22_Dec_2016.csv" #
+file_name<-"housing.csv" #
+#Define the file path
+file_path<-paste(folder_path,file_name,sep="") # create the file_path
+#Read the file and assign it to a new data frame Video_Games_Sales_as_at_22_Dec_2016
+
+
+
+
+Video_Games_Sales_as_at_22_Dec_2016_original<-read_csv(file_path) 
+
+#Display the data
+glimpse(Video_Games_Sales_as_at_22_Dec_2016_original)
+
+summary(Video_Games_Sales_as_at_22_Dec_2016_original)
+
+#There are 14 attributes in each case of the dataset. They are:
+#CRIM - per capita crime rate by town
+#ZN - proportion of residential land zoned for lots over 25,000 sq.ft.
+#INDUS - proportion of non-retail business acres per town.
+#CHAS - Charles River dummy variable (1 if tract bounds river; 0 otherwise)
+#NOX - nitric oxides concentration (parts per 10 million)
+#RM - average number of rooms per dwelling
+#AGE - proportion of owner-occupied units built prior to 1940
+#DIS - weighted distances to five Boston employment centers
+#RAD - index of accessibility to radial highways
+#TAX - full-value property-tax rate per $10,000
+#PTRATIO - pupil-teacher ratio by town
+#B - 1000(Bk - 0.63)^2 where Bk is the proportion of blacks by town
+#LSTAT - % lower status of the population
+#MEDV - Median value of owner-occupied homes in $1000's
+
+
+#Predictive Model :The aim is to predict the sales using the ridge regression model
+#Target Variable (Label) : - Sales
+#Feature Variable : 1) TV
+#2)Radio
+#3)Newspaper
+
+#Performance Metric : Mean Squared error
+#Train-Validate- Test Split(%)
+#Exploratory Data Analysis :The data set contains 200 rows
+#Any null values is dropped
+#For training – 50% of the data shall be used.
+#For Validation – 25% of the data shall be used. – Hyperparameter lambda λ will be tuned in this step
+#For Testing – Remaining 25% of the data shall be used.
+
+#We have 9129 NA's- Remove the NA's
+#omit any null values -Data Cleansing
+Video_Games_Sales_as_at_22_Dec_2016<-na.omit(Video_Games_Sales_as_at_22_Dec_2016_original)
+
+Video_Games_Sales_as_at_22_Dec_2016%>%dim()
+
+#Check the summary again
+summary(Video_Games_Sales_as_at_22_Dec_2016)
+
+#Check the relationships between few of the independent variables and Global Sales.
+
+#construct a plot for the Global_Sales to Critic_Score values. This helps us to gauge the distribution of the data w.r.t to a straight line
+ggplot(Video_Games_Sales_as_at_22_Dec_2016, aes(x=Critic_Score, y=Global_Sales)) + geom_point(shape=1)+geom_smooth(method=lm)
+
+
+#construct a plot for the Global_Sales to Critic_Score values. This helps us to gauge the distribution of the data w.r.t to a straight line
+ggplot(Video_Games_Sales_as_at_22_Dec_2016, aes(x=EU_Sales, y=Global_Sales)) + geom_point(shape=1)+geom_smooth(method=lm)
+
+#construct a plot for the Global_Sales to User_Score values.his helps us to gauge the distribution of the data w.r.t to a straight line
+
+ggplot(Video_Games_Sales_as_at_22_Dec_2016, aes(x=User_Score, y=Global_Sales)) + geom_point(shape=1)+geom_smooth(method=lm)
+
+## We can select Critic_Score and EU_Sales to predict Global_Sales from the inferences drawn from the graphs plotted.
+
+#Create the dataset for the exploration
+Video_Games_Sales_as_at_22_Dec_2016<-Video_Games_Sales_as_at_22_Dec_2016%>%select(Critic_Score,Global_Sales,EU_Sales)
+
+#Convert user_score column to a numeric data set
+
+#Video_Games_Sales_as_at_22_Dec_2016$User_Score<-as.numeric(Video_Games_Sales_as_at_22_Dec_2016$User_Score)
+
+
+
+#Check the structure of the modified data set 
+str(Video_Games_Sales_as_at_22_Dec_2016)
+
+
+
+#Create the training, validation and test split as 50,25 and 25%
+num_total<-Video_Games_Sales_as_at_22_Dec_2016%>%nrow()
+num_total
+num_train<-floor(0.5*num_total)
+num_train
+num_validate<-floor(0.25*num_total)
+num_validate
+num_test<-num_total-num_train-num_validate
+num_test
+
+#Randomly slice samples for the test,validation and train data
+set.seed(123) #set random seed for reproducibility
+test_inds<-sample(seq(num_total),num_test) #test indices
+validate_inds<-sample(setdiff(seq(num_total),test_inds),num_validate) #validate inds
+train_inds<-setdiff(seq(num_total),union(validate_inds,test_inds))
+
+#Create the train,validation and test data sets based on their indices
+
+Video_Games_Sales_as_at_22_Dec_2016_train<-Video_Games_Sales_as_at_22_Dec_2016%>%filter(row_number() %in% train_inds) #train data
+Video_Games_Sales_as_at_22_Dec_2016_validate<-Video_Games_Sales_as_at_22_Dec_2016%>%filter(row_number() %in% validate_inds) #validate data
+Video_Games_Sales_as_at_22_Dec_2016_test<-Video_Games_Sales_as_at_22_Dec_2016%>%filter(row_number() %in% test_inds) #test data
+
+#Now split the train,validation and test data sets into feature vectors and labels.
+
+Video_Games_Sales_as_at_22_Dec_2016_train_x <-Video_Games_Sales_as_at_22_Dec_2016_train%>%select(-Global_Sales)%>%as.matrix() #train features
+Video_Games_Sales_as_at_22_Dec_2016_train_y <-Video_Games_Sales_as_at_22_Dec_2016_train%>%pull(Global_Sales) #train labels
+
+Video_Games_Sales_as_at_22_Dec_2016_validate_x <-Video_Games_Sales_as_at_22_Dec_2016_validate%>%select(-Global_Sales)%>%as.matrix() #validate features
+Video_Games_Sales_as_at_22_Dec_2016_validate_y <-Video_Games_Sales_as_at_22_Dec_2016_validate%>%pull(Global_Sales) #validate labels
+
+
+Video_Games_Sales_as_at_22_Dec_2016_test_x <-Video_Games_Sales_as_at_22_Dec_2016_test%>%select(-Global_Sales)%>%as.matrix() #test features
+Video_Games_Sales_as_at_22_Dec_2016_test_y <-Video_Games_Sales_as_at_22_Dec_2016_test%>%pull(-Global_Sales) #test labels
+
+#Now construct a function to train a ridge regression model and check validation performance
+compute_train_validate_error_ridge<-function(train_x,train_y,validate_x,validate_y,lambda)
+{
+  glmRidge=glmnet(x=train_x,y=train_y ,alpha=0,lambda=lambda) #train model
+  train_y_est<-predict(glmRidge,newx=train_x) #train predictions
+  train_error=mean(train_y-train_y_est^2)
+  
+  validate_y_est<-predict(glmRidge,newx=validate_x)  #validate predictions
+  validate_error=mean((validate_y-validate_y_est)^2) #validation error
+  return(list(train_error=train_error,validate_error=validate_error))
+  
+}
+
+#Now choose a set of hyper-parameters to consider.
+lambda_min=0.0001
+lambdas=0.0001*(1.1^seq(250))
+
+#lambdas=c(0.01,0.02,0.04,0.03)
+
+compute_train_validate_error_ridge(train_x=Video_Games_Sales_as_at_22_Dec_2016_train_x,train_y=Video_Games_Sales_as_at_22_Dec_2016_train_y,validate_x=Video_Games_Sales_as_at_22_Dec_2016_validate_x,validate_y=Video_Games_Sales_as_at_22_Dec_2016_validate_y,lambda=0.0001)
+
+#Now train a ridge regression model for each hyper-parameter and compute validation error
+
+ridge_results_df<-data.frame(lambda=lambdas)%>%mutate(out=map(lambda,~compute_train_validate_error_ridge(train_x=Video_Games_Sales_as_at_22_Dec_2016_train_x,train_y=Video_Games_Sales_as_at_22_Dec_2016_train_y,validate_x=Video_Games_Sales_as_at_22_Dec_2016_validate_x,validate_y=Video_Games_Sales_as_at_22_Dec_2016_validate_y,lambda=.x)))%>%mutate(train_error=map_dbl(out,~((.x)$train_error)),validate_error=map_dbl(out,~((.x)$validate_error)))%>%select(-out)
+
+ggplot(ridge_results_df, aes(x=validate_error, y=lambdas)) + geom_point(shape=1)+geom_smooth()
+
+#Now find the minimum validation error
+min_validation_error<-ridge_results_df%>%pull(validate_error)%>%min()
+
+optimal_lambda<-ridge_results_df%>%filter(validate_error==min_validation_error)%>%pull(lambda)
+
+#Get and display the optimal lambda here
+optimal_lambda
+
+#Now extract the ridge regression model with the optimal hyper-parameter
+final_ridge_model <-glmnet(x=Video_Games_Sales_as_at_22_Dec_2016_train_x,y=Video_Games_Sales_as_at_22_Dec_2016_train_y ,alpha=0,lambda=optimal_lambda)
+
+#Now use the test data to estimate the out-of-sample performance of the trained model
+
+final_ridge_test_y_est<-predict(final_ridge_model,newx=Video_Games_Sales_as_at_22_Dec_2016_test_x)  #test predictions
+final_ridge_test_error=mean((Video_Games_Sales_as_at_22_Dec_2016_test_y-final_ridge_test_y_est)^2) #test error
+
+final_ridge_test_error
+
+
+
+#####Study of OLS
+
+#Create the training, validation and test split
+num_total<-Video_Games_Sales_as_at_22_Dec_2016%>%nrow()
+num_total
+num_train<-floor(0.75*num_total)
+num_train
+num_test<-num_total-num_train
+num_test
+
+
+#Randomly slice samples for the test,validation and train data
+set.seed(123) #set random seed for reproducibility
+test_inds<-sample(seq(num_total),num_test) #test indices
+train_inds<-setdiff(seq(num_total),test_inds)
+
+#Create the train and test data sets based on their indices
+Video_Games_Sales_as_at_22_Dec_2016_train<-Video_Games_Sales_as_at_22_Dec_2016%>%filter(row_number() %in% train_inds) #train data
+Video_Games_Sales_as_at_22_Dec_2016_test<-Video_Games_Sales_as_at_22_Dec_2016%>%filter(row_number() %in% test_inds) #test data
+
+#Now split the train and test data sets into feature vectors and labels
+Video_Games_Sales_as_at_22_Dec_2016_train_x <-Video_Games_Sales_as_at_22_Dec_2016_train%>%select(-Global_Sales)%>%as.matrix() #train features
+Video_Games_Sales_as_at_22_Dec_2016_train_y <-Video_Games_Sales_as_at_22_Dec_2016_train%>%pull(-Global_Sales) #train labels
+
+
+Video_Games_Sales_as_at_22_Dec_2016_test_x <-Video_Games_Sales_as_at_22_Dec_2016_test%>%select(-Global_Sales)%>%as.matrix() #test features
+Video_Games_Sales_as_at_22_Dec_2016_test_y <-Video_Games_Sales_as_at_22_Dec_2016_test%>%pull(-Global_Sales) #test labels
+
+
+
+#Now construct a Ordinary least square function 
+ols_predict_fn<-function(X,y)
+{
+  X_mn0<-scale(X,scale=FALSE) #subtract means of features
+  y_mn0<-scale(y,scale=FALSE) #subract means of labels
+  
+  Sig_XX<-t(X_mn0)%*%X_mn0 #compute features covariance
+  Sig_YX<-t(y_mn0)%*%X_mn0 #compute label features covariance
+  
+  weights<-Sig_YX%*%solve(Sig_XX) #Compute weights
+  intercept<-mean(y)-colMeans(X)%*%t(weights) #Compute intercept
+  
+  predict_fn<-function(x){return((x%*%t(weights)+intercept[1])%>%as.numeric())}
+  return(predict_fn) #extract prediction function
+ 
+}
+ 
+  ols_reg_model<-ols_predict_fn(Video_Games_Sales_as_at_22_Dec_2016_train_x%>%as.matrix(),Video_Games_Sales_as_at_22_Dec_2016_train_y)
+  ols_train_predicted_y<-ols_reg_model(Video_Games_Sales_as_at_22_Dec_2016_train_x%>%as.matrix()) #extract predictions
+  ols_train_error<-mean((ols_train_predicted_y-Video_Games_Sales_as_at_22_Dec_2016_train_y)^2) #compute train error
+  ols_train_error
+  
+   ols_reg_model<-ols_predict_fn(Video_Games_Sales_as_at_22_Dec_2016_test_x%>%as.matrix(),Video_Games_Sales_as_at_22_Dec_2016_test_y)
+  ols_test_predicted_y<-ols_reg_model(Video_Games_Sales_as_at_22_Dec_2016_test_x%>%as.matrix()) #extract predictions
+  ols_test_error<-mean((ols_test_predicted_y-Video_Games_Sales_as_at_22_Dec_2016_train_y)^2) #compute train error
+  ols_test_error
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  #Using the cross validation approach
+  
+  #Take 25% of the data as test data
+  num_total<-Video_Games_Sales_as_at_22_Dec_2016%>%nrow()
+  num_test<-ceiling(0.25*num_total)
+  
+  #Randomly shuffle and select a subset of data for testing.
+  set.seed(1) #set random seed for reproducibility
+  Video_Games_Sales_as_at_22_Dec_2016<-Video_Games_Sales_as_at_22_Dec_2016%>%sample_n(size=nrow(.))
+test_inds<-seq(num_total-num_test+1,num_total)
+
+#Split the data into test and train sample
+
+test_data<-Video_Games_Sales_as_at_22_Dec_2016%>%filter(row_number()%in%test_inds)
+train_and_validation_data<-Video_Games_Sales_as_at_22_Dec_2016%>%filter(!row_number()%in%test_inds)
+
+train_validation_by_fold<-function(train_and_validation_data,fold,num_folds)
+{
+num_train_and_validate<-train_and_validation_data%>%nrow()
+num_per_fold<-ceiling(num_train_and_validate/num_folds)
+fold_start<-(fold-1)*num_per_fold+1
+fold_end<-min(fold*num_per_fold,num_train_and_validate)
+fold_indices<-seq(fold_start,fold_end)
+validation_data<-train_and_validation_data%>%filter(row_number()%in%fold_indices)
+train_data<-train_and_validation_data%>%filter(!row_number()%in%fold_indices)
+return(list(train=train_data,validation=validation_data))
+}
+
+knn_validation_error_by_fold_k<-function(train_and_validation_data,fold,num_folds,y_name,k)
+{
+data_split<-train_validation_by_fold(train_and_validation_data,fold,num_folds)
+train_data<-data_split$train
+validation_data<-data_split$validation
+knn_formula<-paste0(y_name,"~.")
+knn_model<-train.kknn(knn_formula,data=train_data,ks=k,distance=2, kernel="rectangular")
+knn_pred_val_y<-predict(knn_model,validation_data%>%select(-!!sym(y_name)))
+val_y<-validation_data%>%pull(!!sym(y_name))
+val_msg_error<-mean((knn_pred_val_y_-val_y)^2)
+}
+
+num_folds<-10
+ks<-seq(1,30,1)
+
+
+
+  
+  
+  
+
+
+
+```

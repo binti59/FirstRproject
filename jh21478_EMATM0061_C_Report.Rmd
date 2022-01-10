@@ -1,0 +1,253 @@
+---
+title: "jh21478_EMATM0061_C_Report"
+author: "Bikramjit Chowdhury"
+date: "09/01/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r }
+##install.packages("tidyverse")
+##install.packages("caret")
+library(tidyverse)
+##install.packages("Stat2Data")
+library(Stat2Data)
+library(readxl) #load the readxl library
+library(ggplot2)
+library(glmnet)
+library(stringr)
+library(caret)
+
+#Section C : 
+
+#The task and method I plan to explore is Linear Regression→Ridge regression which is a form of Supervised Learning. For the method being explored and model being developed:
+#The ridge regression method minimizes the regularized objective.
+
+  
+#Data set to be used
+#Advertising dataset | Kaggle
+#Location of the data set
+#https://www.kaggle.com/ashydv/sales-prediction-simple-linear-regression/data
+
+#Load the data set in R
+
+#Locate the folder path to read the file
+folder_path<-"/Users/bikramjitchowdhury/Downloads/SCEM/jh21478_EMATM0061_summative_assessment/jh21478_EMATM0061_C/"
+#Define the file name
+file_name<-"advertising.csv" #
+#Define the file path
+file_path<-paste(folder_path,file_name,sep="") # create the file_path
+#Read the file and assign it to a new data frame advertising
+
+advertising_original<-read_csv(file_path) 
+
+#Display the data
+glimpse(advertising_original)
+
+#Rows: 13549 Columns: 7
+#Variables in the data set Include : TV  , Radio, Newspaper, Sales
+
+#Variable Type : TV → Continuous,
+#Radio → Continuous
+#Sales→Continuous
+#Newspaper→Continuous
+
+
+#Predictive Model :The aim is to predict the sales using the mentioned supervised learning algorithm.
+#Target Variable (Label) : - Sales
+
+#Feature Variable : 1) TV
+#2)Radio
+#3)Newspaper
+
+#Performance Metric : Mean Squared error
+
+#Train-Validate- Test Split(%)
+#Exploratory Data Analysis :The data set contains 200 rows
+#Any null values is dropped
+#For training – 50% of the data shall be used.
+#For Validation – 25% of the data shall be used. – Hyperparameter lambda λ will be tuned in this step
+#For Testing – Remaining 25% of the data shall be used.
+
+#What is ridge Regression used for ?
+
+advertising<-na.omit(advertising_original)
+
+
+advertising%>%dim()
+
+#Convert character features into dummy variables.
+# create a new copy of the master data set
+advertising_new<-advertising
+
+# get classes of features in the data set
+featureClasses <- sapply(names(advertising_new), function(x){class(advertising_new[[x]])})
+
+# get character class features
+charFeatures <- names(featureClasses[featureClasses == "character"])
+
+
+# get numeric or integer class features
+numFeatures <- names(featureClasses[featureClasses == "numeric" | featureClasses == "integer"])
+
+str(advertising)
+
+
+
+
+#construct a plot for the Sales to TV 
+ggplot(advertising, aes(x=TV, y=Sales)) + geom_point(shape=1)+geom_smooth(method=lm)
+
+#construct a plot for the Sales to Newspaper 
+
+ggplot(advertising_new, aes(x=Newspaper, y=Sales)) + geom_point(shape=1)+geom_smooth(method=lm)
+
+#construct a plot for the Sales to Radio
+ggplot(advertising_new, aes(x=Radio, y=Sales)) + geom_point(shape=1)+geom_smooth(method=lm)
+
+#Create the training, validation and test split
+num_total<-advertising%>%nrow()
+num_total
+num_train<-floor(0.5*num_total)
+num_train
+num_validate<-floor(0.25*num_total)
+num_validate
+num_test<-num_total-num_train-num_validate
+num_test
+
+#Randomly slice samples for the test,validation and train data
+set.seed(123) #set random seed for reproducibility
+test_inds<-sample(seq(num_total),num_test) #test indices
+validate_inds<-sample(setdiff(seq(num_total),test_inds),num_validate) #validate inds
+train_inds<-setdiff(seq(num_total),union(validate_inds,test_inds))
+
+#Create the train,validation and test data sets based on their indices
+
+advertising_train<-advertising%>%filter(row_number() %in% train_inds) #train data
+advertising_validate<-advertising%>%filter(row_number() %in% validate_inds) #validate data
+advertising_test<-advertising%>%filter(row_number() %in% test_inds) #test data
+
+#Now split the train,validation and test data sets into feature vectors and labels.
+
+advertising_train_x <-advertising_train%>%select(-Sales)%>%as.matrix() #train features
+advertising_train_y <-advertising_train%>%pull(Sales) #train labels
+
+advertising_validate_x <-advertising_validate%>%select(-Sales)%>%as.matrix() #validate features
+advertising_validate_y <-advertising_validate%>%pull(Sales) #validate labels
+
+
+advertising_test_x <-advertising_test%>%select(-Sales)%>%as.matrix() #test features
+advertising_test_y <-advertising_test%>%pull(-Sales) #test labels
+
+#Now construct a function to train a ridge regression model and check validation performance
+compute_train_validate_error_ridge<-function(train_x,train_y,validate_x,validate_y,lambda)
+{
+  glmRidge=glmnet(x=train_x,y=train_y ,alpha=0,lambda=lambda) #train model
+  train_y_est<-predict(glmRidge,newx=train_x) #train predictions
+  train_error=mean(train_y-train_y_est^2)
+  
+  validate_y_est<-predict(glmRidge,newx=validate_x)  #validate predictions
+  validate_error=mean((validate_y-validate_y_est)^2) #validation error
+  return(list(train_error=train_error,validate_error=validate_error))
+  
+}
+
+#Now choose a set of hyper-parameters to consider.
+lambda_min=0.0001
+#lambdas=0.0001*(1.1^seq(250))
+
+lambdas=10^seq(10,-2, length = 100)
+
+compute_train_validate_error_ridge(train_x=advertising_train_x,train_y=advertising_train_y,validate_x=advertising_validate_x,validate_y=advertising_validate_y,lambda=0.0001)
+
+#Now train a ridge regression model for each hyper-parameter and compute validation error
+
+ridge_results_df<-data.frame(lambda=lambdas)%>%mutate(out=map(lambda,~compute_train_validate_error_ridge(train_x=advertising_train_x,train_y=advertising_train_y,validate_x=advertising_validate_x,validate_y=advertising_validate_y,lambda=.x)))%>%mutate(train_error=map_dbl(out,~((.x)$train_error)),validate_error=map_dbl(out,~((.x)$validate_error)))%>%select(-out)
+
+ggplot(advertising_new, aes(x=lambdas, y=validate_error)) + geom_point(shape=1)+geom_smooth(method=lm)
+
+#Now find the minimum validation error
+min_validation_error<-ridge_results_df%>%pull(validate_error)%>%min()
+
+optimal_lambda<-ridge_results_df%>%filter(validate_error==min_validation_error)%>%pull(lambda)
+
+#Get and display the optimal lambda here
+optimal_lambda
+
+#Now extract the ridge regression model with the optimal hyper-parameter
+final_ridge_model <-glmnet(x=advertising_train_x,y=advertising_train_y ,alpha=0,lambda=optimal_lambda)
+
+#Now use the test data to estimate the out-of-sample performance of the trained model
+
+final_ridge_test_y_est<-predict(final_ridge_model,newx=advertising_test_x)  #test predictions
+final_ridge_test_error=mean((advertising_test_y-final_ridge_test_y_est)^2) #test error
+
+
+
+#####Study of OLS
+
+#Create the training, validation and test split
+num_total<-advertising%>%nrow()
+num_total
+num_train<-floor(0.75*num_total)
+num_train
+num_test<-num_total-num_train
+num_test
+
+
+#Randomly slice samples for the test,validation and train data
+set.seed(123) #set random seed for reproducibility
+test_inds<-sample(seq(num_total),num_test) #test indices
+train_inds<-setdiff(seq(num_total),test_inds)
+
+#Create the train and test data sets based on their indices
+advertising_train<-advertising%>%filter(row_number() %in% train_inds) #train data
+advertising_test<-advertising%>%filter(row_number() %in% test_inds) #test data
+
+#Now split the train and test data sets into feature vectors and labels
+advertising_train_x <-advertising_train%>%select(-Sales)%>%as.matrix() #train features
+advertising_train_y <-advertising_train%>%pull(-Sales) #train labels
+
+
+advertising_test_x <-advertising_test%>%select(-Sales)%>%as.matrix() #test features
+advertising_test_y <-advertising_test%>%pull(-Sales) #test labels
+
+
+
+#Now construct a Ordinary least square function 
+ols_predict_fn<-function(X,y)
+{
+  X_mn0<-scale(X,scale=FALSE) #subtract means of features
+  y_mn0<-scale(y,scale=FALSE) #subract means of labels
+  
+  Sig_XX<-t(X_mn0)%*%X_mn0 #compute features covariance
+  Sig_YX<-t(y_mn0)%*%X_mn0 #compute label features covariance
+  
+  weights<-Sig_YX%*%solve(Sig_XX) #Compute weights
+  intercept<-mean(y)-colMeans(X)%*%t(weights) #Compute intercept
+  
+  predict_fn<-function(x){return((x%*%t(weights)+intercept[1])%>%as.numeric())}
+  return(predict_fn) #extract prediction function
+ 
+}
+ 
+  ols_reg_model<-ols_predict_fn(advertising_train_x%>%as.matrix(),advertising_train_y)
+  ols_train_predicted_y<-ols_reg_model(advertising_train_x%>%as.matrix()) #extract predictions
+  ols_train_error<-mean((ols_train_predicted_y-advertising_train_y)^2) #compute train error
+  ols_train_error
+  
+  
+  #Using the cross validation approach
+  
+  
+  
+
