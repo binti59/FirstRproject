@@ -31,8 +31,7 @@ library(caret)
 
 #Section C : 
 
-#The task and method I plan to explore is Linear Regression→Ridge regression which is a form of Supervised Learning. For the method being explored and model being developed:
-#The ridge regression method minimizes the regularized objective.
+#The task and method I plan to explore is Linear Regression→Specifically Ridge regression which is a form of Supervised Learning. 
 
 #Ridge Regression :
 
@@ -42,8 +41,8 @@ library(caret)
 
 #Approach used :
 #1. Ordinary least squares is used to obtain the best fit line.
-#2. Lets say for a training data set the best fit line passes through all the data points -the model then fits very well with the training data sets and has sum of residual squares as 0. However, the testing data sets might have high variance due to the sum of residuals being large. This regression model is therefore ovrfitting the training dataset.So this means this model will perform very good during the training but will perform very poorly during the testing.
-#3. What Ridge Regression does is it takes this line and rotates a bit thus inducing some additional error.the model performance might be bit poor on the training set but it will perform well consistently on both the training and testing dataset as its more generalized. This is called Regularization.
+#2. Lets say for a training data set the best fit line passes through all the data points -the model then fits very well with the training data sets and has sum of residual squares as 0. However, the testing data sets might have high variance due to the sum of residuals being large. This regression model is therefore overfitting the training dataset.This means that this model will perform very good during the training but will perform very poorly during the testing.
+#3. What Ridge Regression does is it takes this line and rotates a bit thus inducing some additional error.The model performance might be bit poor on the training set but it will perform well consistently on both the training and testing dataset as it's more generalized. This is called Regularization.
 #4. So, Ridge Regression works by attempting to increase the bias to improve variance. This happens by changing the slope of the line.
 
    #Ordinary least squares :- Min(Sum of the squared residuals)
@@ -63,7 +62,7 @@ library(caret)
 
 #Load the data set in R
 #Clear the Workspace
-#rm(list=ls())
+rm(list=ls())
 #Locate the folder path to read the file
 folder_path<-"/Users/bikramjitchowdhury/Downloads/SCEM/jh21478_EMATM0061_summative_assessment/jh21478_EMATM0061_C/"
 #Define the file name
@@ -85,19 +84,19 @@ summary(Video_Games_Sales_as_at_22_Dec_2016_original)
 
 
 
-#Predictive Model :The aim is to predict the sales using the ridge regression model
-#Target Variable (Label) : - Sales
-#Feature Variable : 1) TV
-#2)Radio
-#3)Newspaper
+#Predictive Model :The aim is to predict the Global sales using the ridge regression model
+#Target Variable (Label) : - Global Sales
+#Feature Variable : 1) Critic_score
+#2)EU_Sales
 
-#Performance Metric : Mean Squared error
-#Train-Validate- Test Split(%)
-#Exploratory Data Analysis :The data set contains 200 rows
+
+#Performance Metric : Mean Squared error and R-squared
+#Train-Validate- Test Split(%) : We do two cases of train-validate-test splits
+#Exploratory Data Analysis :The data set contains 16719 rows
 #Any null values is dropped
-#For training – 50% of the data shall be used.
-#For Validation – 25% of the data shall be used. – Hyperparameter lambda λ will be tuned in this step
-#For Testing – Remaining 25% of the data shall be used.
+#For training – 50% of the data shall be used for 1st case and 70% for 2nd case
+#For Validation – 25% of the data shall be used for 1st case and 15 % for the second case. – Hyper parameter lambda λ will be tuned and varied to show how its variation affect the test error.
+#For Testing – Remaining 25% and 15% of the data shall be used for each of the two cases
 
 #We have 9129 NA's- Remove the NA's
 #omit any null values -Data Cleansing
@@ -119,16 +118,11 @@ ggplot(Video_Games_Sales_as_at_22_Dec_2016, aes(x=EU_Sales, y=Global_Sales)) + g
 
 #construct a plot for the Global_Sales to User_Score values.his helps us to gauge the distribution of the data w.r.t to a straight line
 
-#ggplot(Video_Games_Sales_as_at_22_Dec_2016, aes(x=NA_Sales, y=Global_Sales)) + geom_point(shape=1)+geom_smooth(method=lm)
 
 ## We can select Critic_Score and EU_Sales to predict Global_Sales from the inferences drawn from the graphs plotted.
 
 #Create the dataset for the exploration
 Video_Games_Sales_as_at_22_Dec_2016<-Video_Games_Sales_as_at_22_Dec_2016%>%select(Critic_Score,Global_Sales,EU_Sales)
-
-#Convert user_score column to a numeric data set
-
-#Video_Games_Sales_as_at_22_Dec_2016$User_Score<-as.numeric(Video_Games_Sales_as_at_22_Dec_2016$User_Score)
 
 
 
@@ -136,7 +130,7 @@ Video_Games_Sales_as_at_22_Dec_2016<-Video_Games_Sales_as_at_22_Dec_2016%>%selec
 str(Video_Games_Sales_as_at_22_Dec_2016)
 
 
-
+#Case 1
 #Create the training, validation and test split as 50,25 and 25%
 num_total<-Video_Games_Sales_as_at_22_Dec_2016%>%nrow()
 num_total
@@ -175,7 +169,200 @@ Video_Games_Sales_as_at_22_Dec_2016_test_y <-Video_Games_Sales_as_at_22_Dec_2016
 
 #Now choose a set of hyper-parameters to consider.
 lambda_min=0.01
-#lambdas=0.0001*(1.1^seq(250))
+
+lambdas=seq(0.01,100,0.01)
+
+#Create this to check the lambda fit
+Ridge<-glmnet(x=Video_Games_Sales_as_at_22_Dec_2016_train_x,y=Video_Games_Sales_as_at_22_Dec_2016_train_y,alpha=0,lambda=lambdas)
+
+#Ridge fit - From the result of the plot it is evident that there is more dependency on coefficient 2 (EU_SALES) than 1 (Critic Score) as when lambda increases the coefficient converges towards 0.
+
+plot(Ridge,xvar='lambda' ,label=T)
+
+#Goodness of Fit
+
+plot(Ridge,xvar='dev' ,label=T)
+
+
+#Now construct a function to train a ridge regression model and check validation performance
+compute_train_validate_error_ridge<-function(train_x,train_y,validate_x,validate_y,lambda)
+{
+  glmRidge=glmnet(x=train_x,y=train_y ,alpha=0,lambda=lambda) #train model
+  train_y_est<-predict(glmRidge,newx=train_x) #train predictions
+  train_error=mean(train_y-train_y_est^2)
+  
+  validate_y_est<-predict(glmRidge,newx=validate_x)  #validate predictions
+  validate_error=mean((validate_y-validate_y_est)^2) #validation error
+  return(list(train_error=train_error,validate_error=validate_error))
+  
+}
+
+
+#Compute the validation error for lambda =0.01
+
+compute_train_validate_error_ridge(train_x=Video_Games_Sales_as_at_22_Dec_2016_train_x,train_y=Video_Games_Sales_as_at_22_Dec_2016_train_y,validate_x=Video_Games_Sales_as_at_22_Dec_2016_validate_x,validate_y=Video_Games_Sales_as_at_22_Dec_2016_validate_y,lambda=0.01)
+
+#Now train a ridge regression model for each hyper-parameter and compute validation error
+
+ridge_results_df<-data.frame(lambda=lambdas)%>%mutate(out=map(lambda,~compute_train_validate_error_ridge(train_x=Video_Games_Sales_as_at_22_Dec_2016_train_x,train_y=Video_Games_Sales_as_at_22_Dec_2016_train_y,validate_x=Video_Games_Sales_as_at_22_Dec_2016_validate_x,validate_y=Video_Games_Sales_as_at_22_Dec_2016_validate_y,lambda=.x)))%>%mutate(train_error=map_dbl(out,~((.x)$train_error)),validate_error=map_dbl(out,~((.x)$validate_error)))%>%select(-out)
+
+#Plot a graph for the validate_error vs lambda to see how the change of lambda affects the validate error values
+
+ggplot(ridge_results_df, aes(x=validate_error, y=lambdas)) + geom_point(shape=1)+geom_smooth()
+
+#Now find the minimum validation error
+min_validation_error<-ridge_results_df%>%pull(validate_error)%>%min()
+
+#The minimum value for the validation error will give us the optimal lambda. Pull that out.
+
+optimal_lambda<-ridge_results_df%>%filter(validate_error==min_validation_error)%>%pull(lambda)
+
+#Get and display the optimal lambda here
+optimal_lambda
+
+#Now extract the ridge regression model with the optimal hyper-parameter.
+final_ridge_model <-glmnet(x=Video_Games_Sales_as_at_22_Dec_2016_train_x,y=Video_Games_Sales_as_at_22_Dec_2016_train_y ,alpha=0,lambda=optimal_lambda)
+
+#Now use the test data to estimate the out-of-sample performance of the trained model
+
+#Predicted Values and coefficients involved.
+final_ridge_test_y_est<-predict(final_ridge_model,newx=Video_Games_Sales_as_at_22_Dec_2016_test_x)  #test predictions
+final_ridge_test_error=mean((Video_Games_Sales_as_at_22_Dec_2016_test_y-final_ridge_test_y_est)^2) #test error
+
+#output the final test error value which is the Mean squared error.
+final_ridge_test_error.
+
+# Get the intercepts and the coefficients involved in the model.
+predict(final_ridge_model,newx=Video_Games_Sales_as_at_22_Dec_2016_test_x,type='coefficients')  #test
+
+#Calculate the value of the R-squared to measure the accuracy of the model
+
+#Calculate the sum-squared total
+sst<-sum((Video_Games_Sales_as_at_22_Dec_2016_test_y-mean(Video_Games_Sales_as_at_22_Dec_2016_test_y))^2)
+#Calculate the sum-squared error
+sse<-sum((final_ridge_test_y_est-Video_Games_Sales_as_at_22_Dec_2016_test_y)^2)
+
+#Calculate the R squared value
+rsquare<-1-(sse/sst)
+rsquare
+
+#This value of R square means the model explains the % of the variation. For Eg means 0.91 means 91% of the variation is explained.
+
+
+## When the Lambda is not optimal lets say lambda =2 , the test error is much large as we expect from the lambda and validate error plot , i.e. test error is 1.691979
+
+lambda2_ridge_model <-glmnet(x=Video_Games_Sales_as_at_22_Dec_2016_train_x,y=Video_Games_Sales_as_at_22_Dec_2016_train_y ,alpha=0,lambda=2)
+
+lambda2_ridge_model_test_y_est<-predict(lambda2_ridge_model,newx=Video_Games_Sales_as_at_22_Dec_2016_test_x)  #test predictions
+lambda2_ridge_model_ridge_test_error=mean((Video_Games_Sales_as_at_22_Dec_2016_test_y-lambda2_ridge_model_test_y_est)^2) #test error
+
+lambda2_ridge_model_ridge_test_error
+# Get the intercepts and the coefficients involved in the model.
+predict(final_ridge_model,newx=Video_Games_Sales_as_at_22_Dec_2016_test_x,type='coefficients')  #test
+
+
+
+#####Study of OLS -Performance of Ridge Regression vs OLS to understand why its better- we can clearly see that with an optimal value of lambda the prediction via ridge regression is much better as compared to OLS when we compare the test error( 0.44 vs 4.40)
+
+#Create the training, validation and test split
+num_total<-Video_Games_Sales_as_at_22_Dec_2016%>%nrow()
+num_total
+num_train<-floor(0.75*num_total)
+num_train
+num_test<-num_total-num_train
+num_test
+
+
+#Randomly slice samples for the test,validation and train data
+set.seed(123) #set random seed for reproducibility
+test_inds<-sample(seq(num_total),num_test) #test indices
+train_inds<-setdiff(seq(num_total),test_inds)
+
+#Create the train and test data sets based on their indices
+Video_Games_Sales_as_at_22_Dec_2016_train<-Video_Games_Sales_as_at_22_Dec_2016%>%filter(row_number() %in% train_inds) #train data
+Video_Games_Sales_as_at_22_Dec_2016_test<-Video_Games_Sales_as_at_22_Dec_2016%>%filter(row_number() %in% test_inds) #test data
+
+#Now split the train and test data sets into feature vectors and labels
+Video_Games_Sales_as_at_22_Dec_2016_train_x <-Video_Games_Sales_as_at_22_Dec_2016_train%>%select(-Global_Sales)%>%as.matrix() #train features
+Video_Games_Sales_as_at_22_Dec_2016_train_y <-Video_Games_Sales_as_at_22_Dec_2016_train%>%pull(-Global_Sales) #train labels
+
+
+Video_Games_Sales_as_at_22_Dec_2016_test_x <-Video_Games_Sales_as_at_22_Dec_2016_test%>%select(-Global_Sales)%>%as.matrix() #test features
+Video_Games_Sales_as_at_22_Dec_2016_test_y <-Video_Games_Sales_as_at_22_Dec_2016_test%>%pull(-Global_Sales) #test labels
+
+
+
+#Now construct a Ordinary least square function 
+ols_predict_fn<-function(X,y)
+{
+  X_mn0<-scale(X,scale=FALSE) #subtract means of features
+  y_mn0<-scale(y,scale=FALSE) #subract means of labels
+  
+  Sig_XX<-t(X_mn0)%*%X_mn0 #compute features covariance
+  Sig_YX<-t(y_mn0)%*%X_mn0 #compute label features covariance
+  
+  weights<-Sig_YX%*%solve(Sig_XX) #Compute weights
+  intercept<-mean(y)-colMeans(X)%*%t(weights) #Compute intercept
+  
+  predict_fn<-function(x){return((x%*%t(weights)+intercept[1])%>%as.numeric())}
+  return(predict_fn) #extract prediction function
+ 
+}
+ 
+  ols_reg_model<-ols_predict_fn(Video_Games_Sales_as_at_22_Dec_2016_train_x%>%as.matrix(),Video_Games_Sales_as_at_22_Dec_2016_train_y)
+  ols_train_predicted_y<-ols_reg_model(Video_Games_Sales_as_at_22_Dec_2016_train_x%>%as.matrix()) #extract predictions
+  ols_train_error<-mean((ols_train_predicted_y-Video_Games_Sales_as_at_22_Dec_2016_train_y)^2) #compute train error
+  ols_train_error
+  
+   ols_reg_model<-ols_predict_fn(Video_Games_Sales_as_at_22_Dec_2016_test_x%>%as.matrix(),Video_Games_Sales_as_at_22_Dec_2016_test_y)
+  ols_test_predicted_y<-ols_reg_model(Video_Games_Sales_as_at_22_Dec_2016_test_x%>%as.matrix()) #extract predictions
+  ols_test_error<-mean((ols_test_predicted_y-Video_Games_Sales_as_at_22_Dec_2016_train_y)^2) #compute train error
+  ols_test_error
+  
+  
+  
+  
+  #Case 2  -> 
+#Create the training, validation and test split as 70,15 and 15%
+ # We observe that with 50% training and 25% validation test split the model performs better than the 70,15 and 15% split ratio between training, validation and testing.
+  
+num_total<-Video_Games_Sales_as_at_22_Dec_2016%>%nrow()
+num_total
+num_train<-floor(0.7*num_total)
+num_train
+num_validate<-floor(0.15*num_total)
+num_validate
+num_test<-num_total-num_train-num_validate
+num_test
+
+#Randomly slice samples for the test,validation and train data
+set.seed(123) #set random seed for reproducibility
+test_inds<-sample(seq(num_total),num_test) #test indices
+validate_inds<-sample(setdiff(seq(num_total),test_inds),num_validate) #validate inds
+train_inds<-setdiff(seq(num_total),union(validate_inds,test_inds))
+
+#Create the train,validation and test data sets based on their indices
+
+Video_Games_Sales_as_at_22_Dec_2016_train<-Video_Games_Sales_as_at_22_Dec_2016%>%filter(row_number() %in% train_inds) #train data
+Video_Games_Sales_as_at_22_Dec_2016_validate<-Video_Games_Sales_as_at_22_Dec_2016%>%filter(row_number() %in% validate_inds) #validate data
+Video_Games_Sales_as_at_22_Dec_2016_test<-Video_Games_Sales_as_at_22_Dec_2016%>%filter(row_number() %in% test_inds) #test data
+
+#Now split the train,validation and test data sets into feature vectors and labels.
+
+Video_Games_Sales_as_at_22_Dec_2016_train_x <-Video_Games_Sales_as_at_22_Dec_2016_train%>%select(-Global_Sales)%>%as.matrix() #train features
+Video_Games_Sales_as_at_22_Dec_2016_train_y <-Video_Games_Sales_as_at_22_Dec_2016_train%>%pull(Global_Sales) #train labels
+
+Video_Games_Sales_as_at_22_Dec_2016_validate_x <-Video_Games_Sales_as_at_22_Dec_2016_validate%>%select(-Global_Sales)%>%as.matrix() #validate features
+Video_Games_Sales_as_at_22_Dec_2016_validate_y <-Video_Games_Sales_as_at_22_Dec_2016_validate%>%pull(Global_Sales) #validate labels
+
+
+Video_Games_Sales_as_at_22_Dec_2016_test_x <-Video_Games_Sales_as_at_22_Dec_2016_test%>%select(-Global_Sales)%>%as.matrix() #test features
+Video_Games_Sales_as_at_22_Dec_2016_test_y <-Video_Games_Sales_as_at_22_Dec_2016_test%>%pull(-Global_Sales) #test labels
+
+
+
+#Now choose a set of hyper-parameters to consider.
+lambda_min=0.01
 
 lambdas=seq(0.01,100,0.01)
 
@@ -206,6 +393,7 @@ compute_train_validate_error_ridge<-function(train_x,train_y,validate_x,validate
   
 }
 
+#Compute the train validate error at lambda =0.01
 
 compute_train_validate_error_ridge(train_x=Video_Games_Sales_as_at_22_Dec_2016_train_x,train_y=Video_Games_Sales_as_at_22_Dec_2016_train_y,validate_x=Video_Games_Sales_as_at_22_Dec_2016_validate_x,validate_y=Video_Games_Sales_as_at_22_Dec_2016_validate_y,lambda=0.01)
 
@@ -214,12 +402,13 @@ compute_train_validate_error_ridge(train_x=Video_Games_Sales_as_at_22_Dec_2016_t
 ridge_results_df<-data.frame(lambda=lambdas)%>%mutate(out=map(lambda,~compute_train_validate_error_ridge(train_x=Video_Games_Sales_as_at_22_Dec_2016_train_x,train_y=Video_Games_Sales_as_at_22_Dec_2016_train_y,validate_x=Video_Games_Sales_as_at_22_Dec_2016_validate_x,validate_y=Video_Games_Sales_as_at_22_Dec_2016_validate_y,lambda=.x)))%>%mutate(train_error=map_dbl(out,~((.x)$train_error)),validate_error=map_dbl(out,~((.x)$validate_error)))%>%select(-out)
 
 
-
+#Plot a graph between validate error and lambda to check how the change in lambda affects the validate error.
 ggplot(ridge_results_df, aes(x=validate_error, y=lambdas)) + geom_point(shape=1)+geom_smooth()
 
 #Now find the minimum validation error
 min_validation_error<-ridge_results_df%>%pull(validate_error)%>%min()
 
+#The minimum value for the validation error will give us the optimal lambda. Pull that out.
 optimal_lambda<-ridge_results_df%>%filter(validate_error==min_validation_error)%>%pull(lambda)
 
 #Get and display the optimal lambda here
@@ -235,7 +424,17 @@ final_ridge_test_y_est<-predict(final_ridge_model,newx=Video_Games_Sales_as_at_2
 final_ridge_test_error=mean((Video_Games_Sales_as_at_22_Dec_2016_test_y-final_ridge_test_y_est)^2) #test error
 
 final_ridge_test_error
+# Get the intercepts and the coefficients involved in the model.
 predict(final_ridge_model,newx=Video_Games_Sales_as_at_22_Dec_2016_test_x,type='coefficients')  #test
+
+#Calculate the sum-squared total
+sst<-sum((Video_Games_Sales_as_at_22_Dec_2016_test_y-mean(Video_Games_Sales_as_at_22_Dec_2016_test_y))^2)
+#Calculate the sum-squared error
+sse<-sum((final_ridge_test_y_est-Video_Games_Sales_as_at_22_Dec_2016_test_y)^2)
+
+#Calculate the R squared value
+rsquare<-1-(sse/sst)
+rsquare
 
 ## When the Lambda is not optimal lets say lambda =2 , the test error is much large as we expect from the lambda and validate error plot , i.e. test error is 1.691979
 
@@ -245,7 +444,7 @@ lambda2_ridge_model_test_y_est<-predict(lambda2_ridge_model,newx=Video_Games_Sal
 lambda2_ridge_model_ridge_test_error=mean((Video_Games_Sales_as_at_22_Dec_2016_test_y-lambda2_ridge_model_test_y_est)^2) #test error
 
 lambda2_ridge_model_ridge_test_error
-
+# Get the intercepts and the coefficients involved in the model.
 predict(final_ridge_model,newx=Video_Games_Sales_as_at_22_Dec_2016_test_x,type='coefficients')  #test
 
 
@@ -307,6 +506,17 @@ ols_predict_fn<-function(X,y)
   ols_test_predicted_y<-ols_reg_model(Video_Games_Sales_as_at_22_Dec_2016_test_x%>%as.matrix()) #extract predictions
   ols_test_error<-mean((ols_test_predicted_y-Video_Games_Sales_as_at_22_Dec_2016_train_y)^2) #compute train error
   ols_test_error
+  
+  #From the above tests we can see that the model performs better in case of Case 1 then in case of Case 2.
+  
+  #References
+#  1 .Applied Ridge Regression -Part 2
+#   https://www.youtube.com/watch?v=2LYyJDmz6Ks
+
+#2. Applied Ridge Regression -Part 1
+#  https://www.youtube.com/watch?v=VCcopvtF31E
+  
+  
   
   
   

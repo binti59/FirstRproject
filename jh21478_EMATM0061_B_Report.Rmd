@@ -35,22 +35,25 @@ library(caret)
 #Using the Law of total probability and Baye's theorem -we derive the value of phi returned by the function below
 #phi=p1*q/(p1*q+p0*(1-q))
 
-#A)
+#a)The function is given below
+
 c_prob_person_given_alarm<-function(p0,p1,q){
   phi=p1*q/(p1*q+p0*(1-q))
   return (phi)
 }
 
-#b
-#A)
+#b When  p0 = 0.05, p1 = 0.95 and q = 0.1 , ϕ is
+
 c_prob_person_given_alarm(0.05,0.95,0.1)
 
 # The answer comes out to be 0.6785714
-#c
-#A)
+
+#c Here take ,p0 = 0.05, p1 = 0.95 a
+
 prob_alarm<-data.frame(q=seq(0.1,1,0.1))%>%
 mutate(prob_q=c_prob_person_given_alarm(0.05,0.95,q))
 
+#A plot which shows ϕ as we vary q.
 prob_alarm%>%ggplot(aes(x=q, y=prob_q)) + geom_point(shape=1)+geom_smooth(method=lm)
 
 
@@ -124,7 +127,7 @@ pull(X)
 return(sample_X)
 } 
 
-#g) Consider α = 0.1, β = 0.2, γ = 0.3,n=100000. Use the function to generate the data
+#g) Consider α = 0.1, β = 0.2, γ = 0.3,n=100000. Use the function sample_X_0125 to generate the data
 #A)
 sample_X<-sample_X_0125(100000,0.1,0.2,0.3)
 mean(sample_X)
@@ -161,17 +164,17 @@ simulate_sample_mean<-crossing(trial=seq(num_trials),sample_size=n)%>%
 
 ggplot(simulate_sample_mean, aes(x=sample_mean))+geom_histogram(binwidth=0.02,color="black", fill="white")
 
-#j) numerical values of expectation in the simulation study
+#j) Numerical values of expectation in the simulation study
     x_mean <-mean(simulate_sample_mean$sample_mean) 
     x_mean
     # comes out to be 2.00102 and 2.0010 up-to four places of decimals
     
-    #numerical values of variance in the simulation study
+    #Numerical values of variance in the simulation study
     x_var<-var(simulate_sample_mean$sample_mean) 
     x_var
     # comes out to be 0.04387057 and 0.0439 up-to four places of decimals
 
-#k)  Now append to your histogram plot an additional curve of the form x 7→ 200 · fµ,σ(x), which displays a re scaled version of the probability density function of a Gaussian random variable with population mean µ = E(X) and population variance σ2 = Var(X).  
+#k)  Now append to the histogram plot an additional curve of the form x 7→ 200 · fµ,σ(x), which displays a re scaled version of the probability density function of a Gaussian random variable with population mean µ = E(X) and population variance σ2 = Var(X).  
 #A
 #Set the parameters of the pdf curve as per mentioned
 tail_inc<-seq(x_mean-4*x_var,
@@ -312,7 +315,8 @@ exp_confidence_interval(sample,confidence_level)
 
 
 
-
+#References :
+#Assignments Problems and solution from EMATM0061_Stat
 
 ```
 

@@ -40,7 +40,7 @@ file_path<-paste(folder_path,file_name,sep="") # create the file_path
 
 finance_data_original<-read_csv(file_path) 
 #Answer A.1
-#Rows: 1051 Columns: 30 -There are 1051 rows and 30 columns in this file
+#Rows: 1051 Columns: 30 -There are 1051 rows and 30 columns in this file finance_data_EMATM0061.csv
 ```
 
 ```{r}
@@ -106,7 +106,7 @@ get_decade<-function(x){
 
 get_decade(243)
 
-#Use your get_decade() function to add a new column to the “finance_data” data frame called “decade” which should give the decade corresponding to the year column.
+#Use  get_decade() function to add a new column to the “finance_data” data frame called “decade” which should give the decade corresponding to the year column.
 
 finance_data<-finance_data%>%mutate(decade=get_decade(as.numeric(year)))
 
@@ -157,7 +157,8 @@ idaho_2000_imputed<-idaho_2000%>%select(year,health_expenditure,education_expend
 #Display the imputed values
 idaho_2000_imputed
 
-
+#References :
+#Assignments Problems and solution from EMATM0061_Statistical Computing and Empirical Methods 2021
 
   
 ```
