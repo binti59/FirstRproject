@@ -11,9 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+This is an R Markdown document. This report contains the workings and solutions of  the SCEM coursework -Section C
 
 ```{r}
 
@@ -50,6 +48,7 @@ library(caret)
    #Lambda*Slope Squared->Regularization term or the penalty.
 # The penalty can then be used to change the slope of the line by varying the Lambda
 # As Lambda increases the slope of the regression line is reduced becoming more horizontal and becomes less sensitive to the variations of the independent variable.
+
 
 #Q Where is ridge regression applied?- Ridge Regression is applied to data sets where we have large amount of features in a data set but not a large number of rows - but we have to find the variables which best describes a linear model. The penalizing term introduced reduces the applicability of the variables of the model to nearly 0 if they are not relevant.
 
@@ -230,7 +229,7 @@ final_ridge_test_y_est<-predict(final_ridge_model,newx=Video_Games_Sales_as_at_2
 final_ridge_test_error=mean((Video_Games_Sales_as_at_22_Dec_2016_test_y-final_ridge_test_y_est)^2) #test error
 
 #output the final test error value which is the Mean squared error.
-final_ridge_test_error.
+final_ridge_test_error
 
 # Get the intercepts and the coefficients involved in the model.
 predict(final_ridge_model,newx=Video_Games_Sales_as_at_22_Dec_2016_test_x,type='coefficients')  #test
@@ -515,6 +514,11 @@ ols_predict_fn<-function(X,y)
 
 #2. Applied Ridge Regression -Part 1
 #  https://www.youtube.com/watch?v=VCcopvtF31E
+
+#3. Assignments Problems and solution from EMATM0061_Statistical Computing and Empirical Methods 2021
+#4.Ridge Regression
+#  https://www.youtube.com/watch?v=OEU22e20tWw
+  
   
   
   

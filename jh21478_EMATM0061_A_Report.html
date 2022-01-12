@@ -173,8 +173,7 @@ pre code {
 
 <div id="r-markdown" class="section level2">
 <h2>R Markdown</h2>
-<p>This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <a href="http://rmarkdown.rstudio.com" class="uri">http://rmarkdown.rstudio.com</a>.</p>
-<p>When you click the <strong>Knit</strong> button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:</p>
+<p>This is an R Markdown document. This report contains the workings and solutions of the SCEM coursework -Section A</p>
 <pre class="r"><code>##install.packages(&quot;tidyverse&quot;)
 ##install.packages(&quot;caret&quot;)
 library(tidyverse)</code></pre>
@@ -225,7 +224,7 @@ finance_data_original&lt;-read_csv(file_path) </code></pre>
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 <pre class="r"><code>#Answer A.1
-#Rows: 1051 Columns: 30 -There are 1051 rows and 30 columns in this file</code></pre>
+#Rows: 1051 Columns: 30 -There are 1051 rows and 30 columns in this file finance_data_EMATM0061.csv</code></pre>
 <pre class="r"><code>#Answer A.2
 #Calculate the number of columns in the original data frame
 ncol(finance_data_original) # 30</code></pre>
@@ -299,7 +298,7 @@ get_decade&lt;-function(x){
 
 get_decade(243)</code></pre>
 <pre><code>## [1] 240</code></pre>
-<pre class="r"><code>#Use your get_decade() function to add a new column to the “finance_data” data frame called “decade” which should give the decade corresponding to the year column.
+<pre class="r"><code>#Use  get_decade() function to add a new column to the “finance_data” data frame called “decade” which should give the decade corresponding to the year column.
 
 finance_data&lt;-finance_data%&gt;%mutate(decade=get_decade(as.numeric(year)))
 
@@ -367,6 +366,9 @@ idaho_2000_imputed</code></pre>
 ## 3 2002             109896.               1768837        -746375
 ## 4 2003             116088                1886421         709085
 ## 5 2004             131165                1768837        1349740</code></pre>
+<pre class="r"><code>#References :
+#1.Assignments Problems and solutions from EMATM0061_Statistical Computing and Empirical Methods 2021
+# 2. Stat Quest :https://www.youtube.com/c/joshstarmer</code></pre>
 </div>
 
 
